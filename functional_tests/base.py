@@ -12,27 +12,6 @@ SCREEN_DUMP_LOCATION = os.path.join(
 )
 
 
-def test():
-    # print(__file__)
-    # print(os.path.abspath(__file__))
-    # print(os.path.dirname(os.path.abspath(__file__)))
-    # print(SCREEN_DUMP_LOCATION)
-    # timestamp = datetime.now().isoformat().replace(':', '.')[:19]
-    # print(datetime.now())
-    # print(datetime.now().isoformat())
-    # print(datetime.now().isoformat().replace(':', '.')[:19])
-
-    # ft = FunctionalTest()
-
-    # print('{folder}/{classname}.{method}-{timestamp}'.format(
-    #     folder=SCREEN_DUMP_LOCATION,
-    #     classname=ft.__class__.__name__,
-    #     method=ft._testMethodName,
-    #     timestamp=timestamp)
-    # )
-    pass
-
-
 def wait(fn):
     def modified_fn(*args, **kwargs):
         start_time = time.time()
@@ -50,9 +29,31 @@ def wait(fn):
 
 class FunctionalTest(LiveServerTestCase):
 
+    def setUp(self):
+        self.browser = webdriver.Firefox()
+
+    def tearDown(self):
+        if self._test_has_failed():
+            if not os.path.exists(SCREEN_DUMP_LOCATION):
+                os.makedirs(SCREEN_DUMP_LOCATION)
+            for ix, handle in enumerate(self.browser.window_handles):
+                self._windowid = ix
+                self.browser.switch_to_window(handle)
+                self.take_screenshot()
+                self.dump_html()
+
+        self.browser.quit()
+        super().tearDown()
+
     @wait
     def wait_for(self, fn):
         return fn()
+
+    def dump_html(self):
+        filename = self._get_filename() + '.html'
+        print('dumping page HTML to', filename)
+        with open(filename, 'w') as f:
+            f.write(self.browser.page_source)
 
     def take_screenshot(self):
         filename = self._get_filename() + '.png'
@@ -68,7 +69,3 @@ class FunctionalTest(LiveServerTestCase):
             windowid=self._windowid,
             timestamp=timestamp
         )
-
-
-if __name__ == '__main__':
-    test()
