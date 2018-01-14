@@ -34,8 +34,11 @@
 
 5. 創建 .gitignore，把不該上傳的東西放進去
 
-6. commit code
+7. commit code
 
+6. 到 my_focus_news/settings.py 的 INSTALLED_APPS 部份加上:
+
+'shownews',
 
 =============================
 
