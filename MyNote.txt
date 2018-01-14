@@ -3,6 +3,7 @@
 =============================
 
 1. 安裝 Django, Selenium, Firefox, MySQL
+    * Selenium 3 需要一個叫做 gekodriver 的東西
 
 2. 安裝 Selenium
 
@@ -11,33 +12,33 @@
     cd C:\Users\gncn\git
 
     django-admin.py startproject my_focus_news
-    
+
     cd my_focus_news
-    
+
     python manage.py startapp shownews
-    
+
     python manage.py runserver ，之後確認 localhost:8000 可以動作
-    
+
     cd ..
-    
-4. 弄上 Github
 
-在 Github 開啟一個名為 my_focus_news 的專案，然後按照網頁上說的做:
+4. 上 Github
 
-    echo "# my_focus_news" >> README.md
-    git init
-    git add README.md
-    git commit -m "first commit"
-    git remote add origin https://github.com/gn01842919/my_focus_news.git
-    git push -u origin master
-    
+    在 Github 開啟一個名為 my_focus_news 的專案，然後按照網頁上說的做:
+
+        echo "# my_focus_news" >> README.md
+        git init
+        git add README.md
+        git commit -m "first commit"
+        git remote add origin https://github.com/gn01842919/my_focus_news.git
+        git push -u origin master
+
 5. 創建 .gitignore，把不該上傳的東西放進去
 
 6. commit code
 
 
 =============================
-        
+
 =============================
 
 
