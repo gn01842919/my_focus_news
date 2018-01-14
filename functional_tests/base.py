@@ -69,3 +69,7 @@ class FunctionalTest(LiveServerTestCase):
             windowid=self._windowid,
             timestamp=timestamp
         )
+
+    def _test_has_failed(self):
+        # slightly obscure but couldn't find a better way!
+        return any(error for (method, error) in self._outcome.errors)
