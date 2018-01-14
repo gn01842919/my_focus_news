@@ -9,7 +9,7 @@ class HomepageTest(FunctionalTest):
         self.browser.get(self.live_server_url)
 
         # Found the url is redirected to /news/
-        expected_url = self.live_server_url + 'new/'
+        expected_url = self.live_server_url + '/news/'
         self.assertEqual(self.browser.current_url, expected_url)
 
         # See the browser title and the header
