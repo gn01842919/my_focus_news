@@ -18,5 +18,9 @@ class HomepageAndNewsTest(TestCase):
 
         response = self.client.get('/news/')
 
+        # print(response.content.decode())
+
         self.assertContains(response, 'Title 1')
         self.assertContains(response, 'Title 2')
+
+        self.assertIsInstance(response.context['all_news'][0], NewsData)

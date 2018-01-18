@@ -4,6 +4,12 @@
 
 {% block  table %}
     <table id="id_news_table" class="table">
-            <tr><td> some texts </td></tr>
+        {% for news in all_news %}
+            <tr>
+                <td>{{ news.title }}</td>
+                <td>{{ news.url }}</td>
+                <td>{{ news.time }}</td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock %}
