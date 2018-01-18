@@ -21,65 +21,74 @@ class NewsDataBasicTest(TestCase):
         self.assertEqual(news.time, saved_news[0].time)
         self.assertEqual(news, saved_news[0])
 
+    def test_ordering(self):
+
+        news1 = NewsData.objects.create(title='t1', url='u1')
+        news2 = NewsData.objects.create(title='t2', url='u2')
+        news3 = NewsData.objects.create(title='t3', url='u3')
+
+        self.assertEqual(news1.title, 't1')
+        self.assertEqual(news1.url, 'u1')
+        self.assertEqual(
+            list(NewsData.objects.all()),
+            [news1, news2, news3]
+        )
+
 
 class NewsDataInputValueTest(TestCase):
 
-    # To ensure that some fields cannot be empty
-    def _assert_raises_validation_or_integrity_error(self, func):
-        try:
-            func()
-        except (ValidationError, IntegrityError) as e:
-            pass
-        else:
-            self.fail('Expected to raise ValidationError or IntegrityError')
+    def test_title(self):
+        # no title
+        with self.assertRaises(ValidationError):
+            NewsData.objects.create(url='http://u1.com').full_clean()
 
-    def test_title_and_input_ordering(self):
+        # empty title
+        with self.assertRaises(ValidationError):
+            NewsData.objects.create(url='http://u2.com', title='').full_clean()
 
-        someurl = 'https://abc.com'
+        # no special charactor constraints
+        NewsData.objects.create(title='--!@:#$%^&*()\t-_=+. ~`\'\"\\|/?<>,', url='http://u3.com').full_clean()
 
-        # test no title
-        self._assert_raises_validation_or_integrity_error(
-            lambda: NewsData.objects.create(url=someurl).full_clean()
-        )
-        self._assert_raises_validation_or_integrity_error(
-            lambda: NewsData.objects.create(url=someurl, title='').full_clean()
-        )
-        news = NewsData.objects.create(title='!@#$%^&*()-_=+.~`\'\"\\|/?<>,', url=someurl)
-        news = NewsData.objects.create(title='中文標題', url=someurl)
-
-        self.fail('Some asserts')
+        # Chinese title
+        NewsData.objects.create(title='中文標題', url='http://u4.com').full_clean()
 
     def test_url(self):
+        news = NewsData()
+        news.title = 'A Breaking News'
 
-        sometitle = 'News title'
+        # no url
+        with self.assertRaises(ValidationError):
+            news.full_clean()
 
-        # test no url
-        self._assert_raises_validation_or_integrity_error(
-            lambda: NewsData.objects.create(title=sometitle, url='').full_clean()
-        )
-        self._assert_raises_validation_or_integrity_error(
-            lambda: NewsData.objects.create(title=sometitle).full_clean()
-        )
+        # empty url
+        news.url = ''
+        with self.assertRaises(ValidationError):
+            news.full_clean()
 
-        news = NewsData.objects.create(url='http://!@#$%^&*()-_=+.~`\'\"\\|/?<>,', title=sometitle)
-        news = NewsData.objects.create(url='http://abc.com/中文連結', title=sometitle)
+        # Chinese url
+        news.url = 'http://中文連結.com'
+        news.full_clean()
+
+        # url should be unique in DB
+        news.save()
+        with self.assertRaises(IntegrityError):
+            NewsData.objects.create(url='http://中文連結.com', title='some title')
 
     def test_time(self):
-
         news = NewsData()
         news.title = 'News title'
-        news.url = 'http://abc.com'
 
         news.time = timezone.now()
+        news.url = 'http://u1.com'
+
         news.save()
 
         # time can be modified
         news.time = datetime(2015, 7, 4, 12, 30, 51)
         news.save()
+        news.full_clean()
 
         # time can be retrieved as a datetime object
         # Note that saved_time is of UTC timezone according to settings.py
         saved_time = NewsData.objects.all()[0].time
         self.assertEqual(saved_time.strftime("%Y/%m/%d %H:%M:%S"), "2015/07/04 12:30:51")
-
-
