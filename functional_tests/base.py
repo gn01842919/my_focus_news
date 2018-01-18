@@ -4,6 +4,7 @@ from selenium.common.exceptions import WebDriverException
 from datetime import datetime
 import time
 import os
+from shownews.models import NewsData
 
 MAX_WAIT = 10
 
@@ -48,6 +49,10 @@ class FunctionalTest(LiveServerTestCase):
     @wait
     def wait_for(self, fn):
         return fn()
+
+    def create_news_data_for_test(self):
+        NewsData.objects.create(title='Title 1', url='http://url1.com')
+        NewsData.objects.create(title='Title 2', url='http://url2.com')
 
     def dump_html(self):
         filename = self._get_filename() + '.html'

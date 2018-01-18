@@ -1,9 +1,12 @@
 from .base import FunctionalTest
 
 
-class HomepageTest(FunctionalTest):
+class HomepageAndNewsPageTest(FunctionalTest):
 
     def test_can_view_the_news_on_homepage(self):
+
+        # Create data for testing
+        self.create_news_data_for_test()
 
         # Go to homepage
         self.browser.get(self.live_server_url)
@@ -21,13 +24,15 @@ class HomepageTest(FunctionalTest):
         # There is a table containing news titles, links, and date
         news_table = self.wait_for(lambda: self.browser.find_element_by_id('id_news_table'))
 
+        # import time
+        # time.sleep(50)
+
         for row in news_table.find_elements_by_tag_name('tr'):
             title = row.find_element_by_css_selector('.news_title')
-            link = row.find_element_by_css_selector('.news_link')
+            url = row.find_element_by_css_selector('.news_url')
             date = row.find_element_by_css_selector('.news_date')
-            print('News: {} {} {}'.format(title, link, date))
-            self.assertIsNotNone(title)
-            self.assertIsNotNone(link)
-            self.assertIsNotNone(date)
+            self.assertTrue(title.text)
+            self.assertTrue(url.text)
+            self.assertTrue(date.text)
 
         # Done
