@@ -27,7 +27,10 @@ class HomepageAndNewsPageTest(FunctionalTest):
         # import time
         # time.sleep(50)
 
-        for row in news_table.find_elements_by_tag_name('tr'):
+        rows = news_table.find_elements_by_tag_name('tr')
+        self.assertTrue(rows)
+
+        for row in rows:
             title = row.find_element_by_css_selector('.news_title')
             url = row.find_element_by_css_selector('.news_url')
             date = row.find_element_by_css_selector('.news_date')
