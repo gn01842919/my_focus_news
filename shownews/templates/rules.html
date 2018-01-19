@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block header_text %}Scraping Rules{% endblock %}
+
+{% block  table %}
+    <table id="id_rules_table" class="table">
+        {% for rule in all_rulss %}
+            <tr>
+                <td class='scraping_rule'>{{ rule }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
