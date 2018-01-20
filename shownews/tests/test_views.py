@@ -25,6 +25,7 @@ class HomepageAndNewsPageTest(TestCase):
 
         self.assertIsInstance(response.context['all_news'][0], NewsData)
 
+
 class RulesPageTest(TestCase):
 
     def test_uses_rules_template(self):

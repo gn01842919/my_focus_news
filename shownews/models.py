@@ -30,7 +30,8 @@ class ScrapingRule(models.Model):
     keywords = models.ManyToManyField(NewsKeyword)
 
     def __str__(self):
-        output = "Include (" + ', '.join(k.name for k in self.keywords.all() if k.to_include)
+        output = "[Active] " if self.active else "[Inactive] "
+        output += "Include (" + ', '.join(k.name for k in self.keywords.all() if k.to_include)
         output += "), Exclude (" + ', '.join(k.name for k in self.keywords.all() if not k.to_include)
         output += ")"
         return output

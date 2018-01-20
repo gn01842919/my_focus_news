@@ -4,6 +4,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+import pytz
 
 
 class NewsDataBasicTest(TestCase):
@@ -84,7 +85,7 @@ class NewsDataInputValueTest(TestCase):
         news.save()
 
         # time can be modified
-        news.time = datetime(2015, 7, 4, 12, 30, 51)
+        news.time = datetime(2015, 7, 4, 12, 30, 51, tzinfo=pytz.UTC)
         news.save()
         news.full_clean()
 

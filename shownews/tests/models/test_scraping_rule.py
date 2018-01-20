@@ -29,4 +29,11 @@ class ScrapingRuleBasicTest(TestCase):
         self.assertTrue(saved_rule.active)
 
         # The whole rule is correct
-        self.assertEqual(saved_rule.__str__(), "Include (keyword1, keyword3), Exclude (keyword2)")
+        self.assertEqual(saved_rule.__str__(), "[Active] Include (keyword1, keyword3), Exclude (keyword2)")
+
+        saved_rule.active = False
+        saved_rule.save()
+        saved_rule.full_clean()
+        saved_rule = ScrapingRule.objects.all()[0]
+
+        self.assertEqual(saved_rule.__str__(), "[Inactive] Include (keyword1, keyword3), Exclude (keyword2)")
