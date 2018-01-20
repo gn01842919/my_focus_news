@@ -50,3 +50,13 @@ class RulesPageTest(TestCase):
         self.assertContains(response, 'keyword1')
         self.assertContains(response, 'keyword2')
         self.assertContains(response, 'keyword3')
+
+
+class CategoriesPageTest(TestCase):
+
+    def test_uses_categories_template(self):
+        response = self.client.get('/categories/')
+        self.assertTemplateUsed(response, 'categories.html')
+
+    def test_display_rules(self):
+        self.fail('Write model first')

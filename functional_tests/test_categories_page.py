@@ -27,7 +27,7 @@ class CategoriesPageTest(FunctionalTest):
         self.assertTrue(rows)
 
         for row in rows:
-            rule = row.find_element_by_css_selector('.category')
+            rule = row.find_element_by_css_selector('.news_category')
             self.assertTrue(rule.text)
 
         # Done
