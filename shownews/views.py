@@ -12,4 +12,4 @@ def news(request):
 
 
 def rules(request):
-    return render(request, 'rules.html')
+    return render(request, 'rules.html', {'all_rules': ScrapingRule.objects.all()})
