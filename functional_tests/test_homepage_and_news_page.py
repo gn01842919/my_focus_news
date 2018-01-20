@@ -1,6 +1,7 @@
 from .base import FunctionalTest
 from shownews.models import NewsData
 
+
 class HomepageAndNewsPageTest(FunctionalTest):
 
     def test_can_view_the_news_on_homepage(self):
