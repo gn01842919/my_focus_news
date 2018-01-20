@@ -10,20 +10,27 @@ class NewsData(models.Model):
     last_modified_time = models.DateTimeField(auto_now=True)
 
 
-class ScrapingRule(models.Model):
-    active = models.BooleanField(default=True)
-
-    def __str__(self):
-        pass
-
-
 class NewsKeyword(models.Model):
-    rule_id = models.ManyToManyField(ScrapingRule)
+
     name = models.CharField(max_length=100)
 
     # True to include this keyword
     # False to exclude this keyword
-    to_include = models.BooleanField()
+    to_include = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "{}({})".format(self.name, "include" if self.to_include else "exclude")
 
     class Meta:
         unique_together = ('name', 'to_include')
+
+
+class ScrapingRule(models.Model):
+    active = models.BooleanField(default=True)
+    keywords = models.ManyToManyField(NewsKeyword)
+
+    def __str__(self):
+        output = "Include (" + ', '.join(k.name for k in self.keywords.all() if k.to_include)
+        output += "), Exclude (" + ', '.join(k.name for k in self.keywords.all() if not k.to_include)
+        output += ")"
+        return output
