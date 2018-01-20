@@ -1,5 +1,5 @@
 from django.test import TestCase
-from shownews.models import NewsData, ScrapingRule
+from shownews.models import NewsData, ScrapingRule, NewsKeyword
 
 
 class HomepageAndNewsPageTest(TestCase):
@@ -33,4 +33,20 @@ class RulesPageTest(TestCase):
         self.assertTemplateUsed(response, 'rules.html')
 
     def test_displays_rules(self):
-        self.fail('to-do')
+
+        rule1 = ScrapingRule.objects.create()
+        rule2 = ScrapingRule.objects.create(active=False)
+        keyword1 = NewsKeyword.objects.create(name='keyword1')
+        keyword2 = NewsKeyword.objects.create(name='keyword2', to_include=False)
+        keyword3 = NewsKeyword.objects.create(name='keyword3')
+        rule1.keywords.add(keyword1, keyword2, keyword3)
+        rule2.keywords.add(keyword2, keyword3)
+
+        response = self.client.get('/rules/')
+
+        self.assertIsInstance(response.context['all_rules'][0], ScrapingRule)
+        self.assertIsInstance(response.context['all_rules'][1], ScrapingRule)
+
+        self.assertContains(response, 'keyword1')
+        self.assertContains(response, 'keyword2')
+        self.assertContains(response, 'keyword3')
