@@ -1,12 +1,13 @@
 from .base import FunctionalTest
-
+from shownews.models import NewsData
 
 class HomepageAndNewsPageTest(FunctionalTest):
 
     def test_can_view_the_news_on_homepage(self):
 
         # Create data for testing
-        self.create_news_data_for_test()
+        NewsData.objects.create(title='Title 1', url='http://url1.com')
+        NewsData.objects.create(title='Title 2', url='http://url2.com')
 
         # Go to homepage
         self.browser.get(self.live_server_url)

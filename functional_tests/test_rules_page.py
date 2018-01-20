@@ -1,5 +1,6 @@
 from .base import FunctionalTest
-from unittest import skip
+from shownews.models import ScrapingRule, NewsKeyword
+# from unittest import skip
 
 
 class RulesPageTest(FunctionalTest):
@@ -7,7 +8,13 @@ class RulesPageTest(FunctionalTest):
     def test_can_view_rules(self):
 
         # Create data for testing
-        self.create_news_data_for_test()
+        rule1 = ScrapingRule.objects.create()
+        rule2 = ScrapingRule.objects.create(active=False)
+        keyword1 = NewsKeyword.objects.create(name='keyword1')
+        keyword2 = NewsKeyword.objects.create(name='keyword2', to_include=False)
+        keyword3 = NewsKeyword.objects.create(name='keyword3')
+        rule1.keywords.add(keyword1, keyword2, keyword3)
+        rule2.keywords.add(keyword2, keyword3)
 
         # Go to rules page
         self.browser.get(self.live_server_url + '/rules/')
@@ -31,37 +38,5 @@ class RulesPageTest(FunctionalTest):
         for row in rows:
             rule = row.find_element_by_css_selector('.scraping_rule')
             self.assertTrue(rule.text)
-
-        # Done
-
-    # @skip
-    # def test_can_edit_rules(self):
-
-        # Go to rules page
-        # self.browser.get('/rules/')
-
-        # See an input area to add a rule
-        # self.fail('to-do')
-        # Add a rule
-
-        # See the added rule
-
-        # Add another rule
-
-        # See the new rule
-
-        # See the buttons to edite or delete a rule
-
-        # Edit the second rule
-
-        # See the updated rule
-
-        # Delete the first rule
-
-        # Now only the second rule exists
-
-        # Delete it
-
-        # No rules now
 
         # Done
