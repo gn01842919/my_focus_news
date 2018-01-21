@@ -1,5 +1,5 @@
 from django.test import TestCase
-from shownews.models import NewsData, ScrapingRule, NewsKeyword
+from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
 
 
 class HomepageAndNewsPageTest(TestCase):
@@ -39,8 +39,13 @@ class RulesPageTest(TestCase):
         keyword1 = NewsKeyword.objects.create(name='keyword1')
         keyword2 = NewsKeyword.objects.create(name='keyword2', to_include=False)
         keyword3 = NewsKeyword.objects.create(name='keyword3')
+        tag1 = NewsCategory.objects.create(name='tag1')
+        tag2 = NewsCategory.objects.create(name='tag2')
+
         rule1.keywords.add(keyword1, keyword2, keyword3)
+        rule1.tags.add(tag1)
         rule2.keywords.add(keyword2, keyword3)
+        rule2.tags.add(tag1, tag2)
 
         response = self.client.get('/rules/')
 
@@ -51,6 +56,9 @@ class RulesPageTest(TestCase):
         self.assertContains(response, 'keyword2')
         self.assertContains(response, 'keyword3')
 
+        self.assertContains(response, 'tag1')
+        self.assertContains(response, 'tag2')
+
 
 class CategoriesPageTest(TestCase):
 
@@ -59,4 +67,13 @@ class CategoriesPageTest(TestCase):
         self.assertTemplateUsed(response, 'categories.html')
 
     def test_display_rules(self):
-        self.fail('Write model first')
+        NewsCategory.objects.create(name='tag1')
+        NewsCategory.objects.create(name='tag2')
+
+        response = self.client.get('/categories/')
+
+        self.assertIsInstance(response.context['all_categories'][0], NewsCategory)
+        self.assertIsInstance(response.context['all_categories'][1], NewsCategory)
+
+        self.assertContains(response, 'tag1')
+        self.assertContains(response, 'tag2')

@@ -4,9 +4,9 @@
 
 {% block  table %}
     <table id="id_categories_table" class="table">
-        {% for c in all_categories %}
+        {% for tag in all_categories %}
             <tr>
-                <td class='news_category'>{{ c }}</td>
+                <td class='news_category'>{{ tag.name }}</td>
             </tr>
         {% endfor %}
     </table>

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from shownews.models import NewsData, ScrapingRule
+from shownews.models import NewsData, ScrapingRule, NewsCategory
 
 
 # Create your views here.
@@ -16,4 +16,4 @@ def rules(request):
 
 
 def categories(request):
-    return render(request, 'categories.html')
+    return render(request, 'categories.html', {'all_categories': NewsCategory.objects.all()})
