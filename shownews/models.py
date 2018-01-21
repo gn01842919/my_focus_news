@@ -5,6 +5,9 @@ from django.utils import timezone
 class NewsCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class NewsKeyword(models.Model):
 
@@ -42,3 +45,6 @@ class NewsData(models.Model):
     last_modified_time = models.DateTimeField(auto_now=True)
     # The rules which created this news
     rules = models.ManyToManyField(ScrapingRule)
+
+    def __str__(self):
+        return self.title
