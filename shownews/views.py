@@ -16,4 +16,10 @@ def rules(request):
 
 
 def categories(request):
-    return render(request, 'categories.html', {'all_categories': NewsCategory.objects.all()})
+    return render(
+        request, 'categories.html',
+        {
+            'all_categories': NewsCategory.objects.all(),
+            'title_text': 'News Categories'
+        }
+    )

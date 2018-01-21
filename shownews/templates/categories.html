@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block header_text %}News Categories{% endblock %}
+{% block header_text %}{{ title_text }}{% endblock %}
 
 {% block  table %}
     <table id="id_categories_table" class="table">
         {% for tag in all_categories %}
             <tr>
-                <td class='news_category'>{{ tag.name }}</td>
+                <td class='news_category'><a href='#'>{{ tag.name }}</a></td>
             </tr>
         {% endfor %}
     </table>
