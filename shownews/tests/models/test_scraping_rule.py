@@ -1,5 +1,5 @@
 from django.test import TestCase
-from shownews.models import ScrapingRule, NewsKeyword
+from shownews.models import ScrapingRule, NewsKeyword, NewsCategory
 
 
 class ScrapingRuleBasicTest(TestCase):
@@ -14,6 +14,11 @@ class ScrapingRuleBasicTest(TestCase):
         rule1.keywords.add(keyword2)
         rule1.keywords.add(keyword2)
         rule1.keywords.add(keyword3)
+        tag1 = NewsCategory.objects.create(name='finance')
+        tag2 = NewsCategory.objects.create(name='politics')
+        rule1.tags.add(tag1, tag2)
+        rule2.tags.add(tag2)
+
 
         # another rule
         rule2.keywords.add(keyword2, keyword3)
@@ -35,7 +40,7 @@ class ScrapingRuleBasicTest(TestCase):
         self.assertTrue(saved_rules[0].active)
 
         # The whole rule is correct
-        self.assertEqual(saved_rules[0].__str__(), "[Active] Include (keyword1, keyword3), Exclude (keyword2)")
+        self.assertEqual(str(saved_rules[0]), "[Active] Include (keyword1, keyword3), Exclude (keyword2), Tags (finance, politics)")
 
         # Check that active can be set to False
         rule1.active = False
@@ -46,5 +51,5 @@ class ScrapingRuleBasicTest(TestCase):
         self.assertEqual(saved_rules[0].keywords.count(), 3)
         self.assertFalse(saved_rules[0].active)
 
-        self.assertEqual(saved_rules[0].__str__(), "[Inactive] Include (keyword1, keyword3), Exclude (keyword2)")
-        self.assertEqual(saved_rules[1].__str__(), "[Active] Include (keyword3), Exclude (keyword2)")
+        self.assertEqual(str(saved_rules[0]), "[Inactive] Include (keyword1, keyword3), Exclude (keyword2), Tags (finance, politics)")
+        self.assertEqual(str(saved_rules[1]), "[Active] Include (keyword3), Exclude (keyword2), Tags (politics)")
