@@ -37,6 +37,6 @@ class RulesPageTest(FunctionalTest):
 
         for row in rows:
             rule = row.find_element_by_css_selector('.scraping_rule')
-            self.assertTrue(rule.text)
+            self.assertTrue(rule.text)  # Should be adjust to use assertEqual someday...
 
         # Done

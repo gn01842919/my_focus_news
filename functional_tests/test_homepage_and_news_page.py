@@ -32,12 +32,12 @@ class HomepageAndNewsPageTest(FunctionalTest):
         rows = news_table.find_elements_by_tag_name('tr')
         self.assertTrue(rows)
 
-        for row in rows:
+        for index, row in enumerate(rows, 1):
             title = row.find_element_by_css_selector('.news_title')
             url = row.find_element_by_css_selector('.news_url')
             date = row.find_element_by_css_selector('.news_date')
-            self.assertTrue(title.text)
-            self.assertTrue(url.text)
+            self.assertEqual(title.text, 'Title %d' % (index))
+            self.assertEqual(url.text, 'http://url%d.com' % (index))
             self.assertTrue(date.text)
 
         # Done
