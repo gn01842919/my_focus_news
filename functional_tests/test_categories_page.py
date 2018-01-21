@@ -1,4 +1,5 @@
 from .base import FunctionalTest
+from shownews.models import NewsCategory
 
 
 class CategoriesPageTest(FunctionalTest):
@@ -6,6 +7,8 @@ class CategoriesPageTest(FunctionalTest):
     def test_can_view_categories(self):
 
         # Create data for testing
+        NewsCategory.objects.create(name='tag1')
+        NewsCategory.objects.create(name='tag2')
 
         # Go to rules page
         self.browser.get(self.live_server_url + '/categories/')
