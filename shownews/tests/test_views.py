@@ -2,11 +2,14 @@ from django.test import TestCase
 from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
 
 
-class HomepageAndNewsPageTest(TestCase):
+class HomepageTest(TestCase):
 
     def test_homepage_redirect_to_news(self):
         response = self.client.get('/')
         self.assertRedirects(response, '/news/')
+
+
+class NewsPageTest(TestCase):
 
     def test_uses_news_template(self):
         response = self.client.get('/news/')
@@ -24,6 +27,46 @@ class HomepageAndNewsPageTest(TestCase):
         self.assertContains(response, 'Title 2')
 
         self.assertIsInstance(response.context['all_news'][0], NewsData)
+
+    def test_display_news_for_given_category(self):
+        tag1 = NewsCategory.objects.create(name='tag1')
+        tag2 = NewsCategory.objects.create(name='tag2')
+        tag3 = NewsCategory.objects.create(name='tag3')
+        rule1 = ScrapingRule.objects.create()
+        rule2 = ScrapingRule.objects.create()
+        rule1.tags.add(tag1, tag2)
+        rule2.tags.add(tag1, tag3)
+        news1 = NewsData.objects.create(title='Title 1', url='http://url1.com')
+        news2 = NewsData.objects.create(title='Title 2', url='http://url2.com')
+
+        news1.rules.add(rule1)
+        news2.rules.add(rule2)
+
+        # tag1 ==> news1, news2
+        # tag2 ==> news1
+        # tag3 ==> news2
+
+        # Test the page for tag1
+        response = self.client.get('/news/category/%s/' % tag1.name)
+        self.assertIsInstance(response.context['all_news'][0], NewsData)
+        self.assertIsInstance(response.context['all_news'][1], NewsData)
+        self.assertContains(response, news1.title)
+        self.assertContains(response, news2.title)
+
+        # Test the page for tag2
+        response = self.client.get('/news/category/%s/' % tag2.name)
+        self.assertIsInstance(response.context['all_news'][0], NewsData)
+        self.assertContains(response, news1.title)
+        self.assertNotContains(response, news2.title)
+
+        # Test the page for tag3
+        response = self.client.get('/news/category/%s/' % tag3.name)
+        self.assertIsInstance(response.context['all_news'][0], NewsData)
+        self.assertContains(response, news1.title)
+        self.assertNotContains(response, news2.title)
+
+    def test_display_news_for_given_rule_id(self):
+        pass
 
 
 class RulesPageTest(TestCase):
