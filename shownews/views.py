@@ -23,3 +23,7 @@ def categories(request):
             'title_text': 'News Categories'
         }
     )
+
+
+def news_by_category(request):
+    return None

@@ -48,6 +48,7 @@ class NewsPageTest(TestCase):
 
         # Test the page for tag1
         response = self.client.get('/news/category/%s/' % tag1.name)
+        self.assertTemplateUsed(response, 'news.html')
         self.assertIsInstance(response.context['all_news'][0], NewsData)
         self.assertIsInstance(response.context['all_news'][1], NewsData)
         self.assertContains(response, news1.title)
@@ -55,15 +56,13 @@ class NewsPageTest(TestCase):
 
         # Test the page for tag2
         response = self.client.get('/news/category/%s/' % tag2.name)
-        self.assertIsInstance(response.context['all_news'][0], NewsData)
         self.assertContains(response, news1.title)
         self.assertNotContains(response, news2.title)
 
         # Test the page for tag3
         response = self.client.get('/news/category/%s/' % tag3.name)
-        self.assertIsInstance(response.context['all_news'][0], NewsData)
-        self.assertContains(response, news1.title)
-        self.assertNotContains(response, news2.title)
+        self.assertNotContains(response, news1.title)
+        self.assertContains(response, news2.title)
 
     def test_display_news_for_given_rule_id(self):
         pass
