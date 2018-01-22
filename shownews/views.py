@@ -25,5 +25,23 @@ def categories(request):
     )
 
 
-def news_by_category(request):
-    return None
+def news_by_category(request, category):
+
+    target_tags = NewsCategory.objects.filter(name=category)
+
+    target_rules = set()
+
+    for tag in target_tags:
+        target_rules.update(tag.scrapingrule_set.all())
+
+    # print(target_rules)
+
+    result = []
+
+    for news in NewsData.objects.all():
+        for rule in news.rules.all():
+            if rule in target_rules:
+                result.append(news)
+                break
+
+    return render(request, 'news.html', {'all_news': result})
