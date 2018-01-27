@@ -15,13 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from shownews.views import homepage, rules, categories
-from shownews import urls as news_urls
+from shownews.views import *
+
+news_patterns = [
+    url(r'^$', news),
+    url(r'^category/([^/]+)/$', news_by_category, name='news_by_category'),
+    url(r'^rule/(\d+)/$', news_by_rule, name='news_by_rule'),
+]
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', homepage),
-    url(r'^news/', include(news_urls)),
-    url(r'^rules/$', rules),
-    url(r'^categories/$', categories),
+    url(r'^$', homepage, name='home'),
+    url(r'^news/', include(news_patterns)),
+    url(r'^rules/$', rules, name='rules'),
+    url(r'^categories/$', categories, name='categories'),
 ]

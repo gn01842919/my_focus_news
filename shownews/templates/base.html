@@ -19,10 +19,9 @@
     <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
             <ul class="nav navbar-nav navbar-left">
-                <li><a href="/news/">Home</a></li>
-                <li><a href="/rules/">Scraping Rules</a></li>
-                <li><a href="/categories/">News Categories</a></li>
-
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'rules' %}">Scraping Rules</a></li>
+                <li><a href="{% url 'categories' %}">News Categories</a></li>
             </ul>
         </div>
     </nav>
