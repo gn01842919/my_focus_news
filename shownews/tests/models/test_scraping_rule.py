@@ -1,5 +1,5 @@
 from django.test import TestCase
-from shownews.models import ScrapingRule, NewsKeyword, NewsCategory
+from shownews.models import ScrapingRule, NewsKeyword, NewsCategory, NewsData
 
 
 class ScrapingRuleBasicTest(TestCase):
@@ -64,3 +64,10 @@ class ScrapingRuleBasicTest(TestCase):
             "<Rule %d> [Active] Include (keyword3), "
             "Exclude (keyword2), Tags (politics)" % saved_rules[1].id
         )
+
+    def test_get_news_url(self):
+
+        news = NewsData.objects.create(title='title1', url='http://url.com')
+        rule = ScrapingRule.objects.create()
+        news.rules.add(rule)
+        self.assertEqual(rule.get_absolute_url(), '/news/rule/%d/' % rule.id)

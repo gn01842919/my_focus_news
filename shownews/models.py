@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.core.urlresolvers import reverse
 
 
 class NewsCategory(models.Model):
@@ -7,6 +8,9 @@ class NewsCategory(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('news_by_category', args=[self.name])
 
 
 class NewsKeyword(models.Model):
@@ -36,6 +40,9 @@ class ScrapingRule(models.Model):
         output += "), Exclude (" + ', '.join(k.name for k in self.keywords.all() if not k.to_include)
         output += "), Tags (" + ', '.join(t.name for t in self.tags.all()) + ')'
         return output
+
+    def get_absolute_url(self):
+        return reverse('news_by_rule', args=[self.id])
 
 
 class NewsData(models.Model):

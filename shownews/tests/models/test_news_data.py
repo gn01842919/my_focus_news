@@ -28,12 +28,12 @@ class NewsDataBasicTest(TestCase):
 
     def test_ordering(self):
 
-        news1 = NewsData.objects.create(title='t1', url='u1')
-        news2 = NewsData.objects.create(title='t2', url='u2')
-        news3 = NewsData.objects.create(title='t3', url='u3')
+        news1 = NewsData.objects.create(title='t1', url='http://u1.com')
+        news2 = NewsData.objects.create(title='t2', url='http://u2.com')
+        news3 = NewsData.objects.create(title='t3', url='http://u3.com')
 
         self.assertEqual(news1.title, 't1')
-        self.assertEqual(news1.url, 'u1')
+        self.assertEqual(news1.url, 'http://u1.com')
         self.assertEqual(
             list(NewsData.objects.all()),
             [news1, news2, news3]
