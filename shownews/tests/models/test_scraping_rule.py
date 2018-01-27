@@ -5,8 +5,8 @@ from shownews.models import ScrapingRule, NewsKeyword, NewsCategory, NewsData
 class ScrapingRuleBasicTest(TestCase):
 
     def test_can_save_and_retrive(self):
-        rule1 = ScrapingRule.objects.create()
-        rule2 = ScrapingRule.objects.create()
+        rule1 = ScrapingRule.objects.create(name='rule1')
+        rule2 = ScrapingRule.objects.create(name='rule2')
         keyword1 = NewsKeyword.objects.create(name='keyword1')
         keyword2 = NewsKeyword.objects.create(name='keyword2', to_include=False)
         keyword3 = NewsKeyword.objects.create(name='keyword3')
@@ -40,7 +40,7 @@ class ScrapingRuleBasicTest(TestCase):
 
         # The whole rule is correct
         self.assertEqual(
-            str(saved_rules[0]),
+            saved_rules[0].details,
             "<Rule %d> [Active] Include (keyword1, keyword3), Exclude (keyword2), "
             "Tags (finance, politics)" % saved_rules[0].id
         )
@@ -55,12 +55,12 @@ class ScrapingRuleBasicTest(TestCase):
         self.assertFalse(saved_rules[0].active)
 
         self.assertEqual(
-            str(saved_rules[0]),
+            saved_rules[0].details,
             "<Rule %d> [Inactive] Include (keyword1, keyword3), "
             "Exclude (keyword2), Tags (finance, politics)" % saved_rules[0].id
         )
         self.assertEqual(
-            str(saved_rules[1]),
+            saved_rules[1].details,
             "<Rule %d> [Active] Include (keyword3), "
             "Exclude (keyword2), Tags (politics)" % saved_rules[1].id
         )

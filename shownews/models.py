@@ -30,17 +30,22 @@ class NewsKeyword(models.Model):
 
 
 class ScrapingRule(models.Model):
+    name = models.CharField(max_length=100, default='')
     active = models.BooleanField(default=True)
     keywords = models.ManyToManyField(NewsKeyword)
     tags = models.ManyToManyField(NewsCategory)
 
-    def __str__(self):
+    @property
+    def details(self):
         output = "<Rule %d> " % (self.id)
         output += "[Active] " if self.active else "[Inactive] "
         output += "Include (" + ', '.join(k.name for k in self.keywords.all() if k.to_include)
         output += "), Exclude (" + ', '.join(k.name for k in self.keywords.all() if not k.to_include)
         output += "), Tags (" + ', '.join(t.name for t in self.tags.all()) + ')'
         return output
+
+    def __str__(self):
+        return self.name + '  ' + self.details
 
     def get_absolute_url(self):
         return reverse('news_by_rule', args=[self.id])

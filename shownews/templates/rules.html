@@ -5,8 +5,9 @@
 {% block  table %}
     <table id="id_rules_table" class="table">
         {% for rule in all_rules %}
-            <tr>
-                <td class="scraping_rule"><a href="{% url 'news_by_rule' rule.id %}">{{ rule }}</a></td>
+            <tr class="scraping_rule">
+                <td><a href="{% url 'news_by_rule' rule.id %}">{{ rule.name }}</a></td>
+                <td>{{ rule.details }}</td>
             </tr>
         {% endfor %}
     </table>

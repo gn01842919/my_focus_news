@@ -57,5 +57,5 @@ def news_by_rule(request, rule_id):
 
     return render(request, 'news.html', {
         'all_news': rule.newsdata_set.all(),
-        'page_title': str(rule),
+        'page_title': rule.name,
     })

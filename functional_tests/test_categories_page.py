@@ -37,13 +37,12 @@ class CategoriesPageTest(FunctionalTest):
     def test_click_category_will_show_related_news(self):
 
         tag_names = ['Finance', '政治']
-        expected_finance_url = self.live_server_url + '/news/category/Finance/'
-        expected_politics_url = self.live_server_url + '/news/category/政治/'
-        expected_categories_page_url = self.live_server_url + '/categories/'
+        expected_url = self.live_server_url + '/news/category/%d/'
+        categories_page_url = self.live_server_url + '/categories/'
 
         # Create testing data
-        NewsCategory.objects.create(name=tag_names[0])
-        NewsCategory.objects.create(name=tag_names[1])
+        tag1 = NewsCategory.objects.create(name=tag_names[0])
+        tag2 = NewsCategory.objects.create(name=tag_names[1])
 
         # Go to categories page
         self.browser.get(self.live_server_url + '/categories/')
@@ -64,7 +63,7 @@ class CategoriesPageTest(FunctionalTest):
         )
 
         # Found that url is redirected to /news/category/Finance/
-        self.assertEqual(self.browser.current_url, expected_finance_url)
+        self.assertEqual(self.browser.current_url, expected_url % (tag1.id))
 
         # Go back to the categories page
         self.browser.find_element_by_link_text('News Categories').click()
@@ -74,7 +73,7 @@ class CategoriesPageTest(FunctionalTest):
         )
 
         # The url is back to /categories/
-        self.assertEqual(self.browser.current_url, expected_categories_page_url)
+        self.assertEqual(self.browser.current_url, categories_page_url)
 
         # Click the "政治" link
         categories_table.find_element_by_link_text('政治').click()
@@ -88,6 +87,6 @@ class CategoriesPageTest(FunctionalTest):
         )
 
         # The url is redirected to /news/category/政治/
-        self.assertEqual(self.browser.current_url, expected_politics_url)
+        self.assertEqual(self.browser.current_url, expected_url % (tag2.id))
 
         # Done
