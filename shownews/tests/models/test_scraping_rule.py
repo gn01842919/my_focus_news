@@ -19,7 +19,6 @@ class ScrapingRuleBasicTest(TestCase):
         rule1.tags.add(tag1, tag2)
         rule2.tags.add(tag2)
 
-
         # another rule
         rule2.keywords.add(keyword2, keyword3)
 
@@ -40,7 +39,11 @@ class ScrapingRuleBasicTest(TestCase):
         self.assertTrue(saved_rules[0].active)
 
         # The whole rule is correct
-        self.assertEqual(str(saved_rules[0]), "[Active] Include (keyword1, keyword3), Exclude (keyword2), Tags (finance, politics)")
+        self.assertEqual(
+            str(saved_rules[0]),
+            "<Rule %d> [Active] Include (keyword1, keyword3), Exclude (keyword2), "
+            "Tags (finance, politics)" % saved_rules[0].id
+        )
 
         # Check that active can be set to False
         rule1.active = False
@@ -51,5 +54,13 @@ class ScrapingRuleBasicTest(TestCase):
         self.assertEqual(saved_rules[0].keywords.count(), 3)
         self.assertFalse(saved_rules[0].active)
 
-        self.assertEqual(str(saved_rules[0]), "[Inactive] Include (keyword1, keyword3), Exclude (keyword2), Tags (finance, politics)")
-        self.assertEqual(str(saved_rules[1]), "[Active] Include (keyword3), Exclude (keyword2), Tags (politics)")
+        self.assertEqual(
+            str(saved_rules[0]),
+            "<Rule %d> [Inactive] Include (keyword1, keyword3), "
+            "Exclude (keyword2), Tags (finance, politics)" % saved_rules[0].id
+        )
+        self.assertEqual(
+            str(saved_rules[1]),
+            "<Rule %d> [Active] Include (keyword3), "
+            "Exclude (keyword2), Tags (politics)" % saved_rules[1].id
+        )

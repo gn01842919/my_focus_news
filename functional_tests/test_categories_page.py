@@ -41,14 +41,13 @@ class CategoriesPageTest(FunctionalTest):
         expected_politics_url = self.live_server_url + '/news/category/Politics/'
         expected_categories_page_url = self.live_server_url + '/categories/'
 
-        # Create data for testing
+        # Create testing data
         NewsCategory.objects.create(name=tag_names[0])
         NewsCategory.objects.create(name=tag_names[1])
 
-        # Go to rules page
+        # Go to categories page
         self.browser.get(self.live_server_url + '/categories/')
 
-        # There is a table containing current rules
         categories_table = self.wait_for(
             lambda: self.browser.find_element_by_id('id_categories_table')
         )
@@ -56,7 +55,7 @@ class CategoriesPageTest(FunctionalTest):
         # Click the "Finance" link
         categories_table.find_element_by_link_text('Finance').click()
 
-        # Found all news under Finance category
+        # Found the title is different
         self.wait_for(
             lambda: self.assertEqual(
                 self.browser.find_element_by_tag_name('h1').text,
@@ -77,9 +76,10 @@ class CategoriesPageTest(FunctionalTest):
         # The url is back to /categories/
         self.assertEqual(self.browser.current_url, expected_categories_page_url)
 
-        # Click the "Politics" link, and see all news under this category
+        # Click the "Politics" link
         categories_table.find_element_by_link_text('Politics').click()
 
+        # Found the title is different
         self.wait_for(
             lambda: self.assertEqual(
                 self.browser.find_element_by_tag_name('h1').text,

@@ -6,7 +6,7 @@
     <table id="id_rules_table" class="table">
         {% for rule in all_rules %}
             <tr>
-                <td class='scraping_rule'>{{ rule }}</td>
+                <td class='scraping_rule'><a href='/news/rule/{{ rule.id }}'>{{ rule }}</a></td>
             </tr>
         {% endfor %}
     </table>

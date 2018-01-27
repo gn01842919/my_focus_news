@@ -57,4 +57,7 @@ def news_by_rule(request, rule_id):
 
     rule = ScrapingRule.objects.get(id=rule_id)
 
-    return render(request, 'news.html', {'all_news': rule.newsdata_set.all()})
+    return render(request, 'news.html', {
+        'all_news': rule.newsdata_set.all(),
+        'page_title': str(rule),
+    })
