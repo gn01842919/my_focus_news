@@ -7,10 +7,17 @@ def homepage(request):
     return redirect('/news/')
 
 
-def news(request):
+def unread_news(request):
     return render(request, 'news.html', {
         'news_set': NewsData.objects.all(),
-        'page_title': 'My Focus News',
+        'page_title': 'Unread Focus News',
+    })
+
+
+def all_news(request):
+    return render(request, 'news.html', {
+        'news_set': NewsData.objects.all(),
+        'page_title': 'All News',
     })
 
 

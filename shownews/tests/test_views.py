@@ -7,7 +7,7 @@ class HomepageTest(TestCase):
 
     def test_homepage_redirect_to_news(self):
         response = self.client.get('/')
-        self.assertRedirects(response, reverse('all_news'))
+        self.assertRedirects(response, reverse('unread_news'))
 
 
 class NewsPageTest(TestCase):
@@ -15,8 +15,10 @@ class NewsPageTest(TestCase):
     def test_template_used(self):
         response = self.client.get(reverse('all_news'))
         self.assertTemplateUsed(response, 'news.html')
+        response = self.client.get(reverse('unread_news'))
+        self.assertTemplateUsed(response, 'news.html')
 
-    def test_displays_news_data(self):
+    def test_displays_all_the_news(self):
         NewsData.objects.create(title='Title 1', url='http://url1.com')
         NewsData.objects.create(title='Title 2', url='http://url2.com')
 
