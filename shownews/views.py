@@ -8,7 +8,10 @@ def homepage(request):
 
 
 def news(request):
-    return render(request, 'news.html', {'all_news': NewsData.objects.all()})
+    return render(request, 'news.html', {
+        'all_news': NewsData.objects.all(),
+        'page_title': 'My Focus News',
+    })
 
 
 def rules(request):
@@ -44,7 +47,10 @@ def news_by_category(request, category):
                 news_set.append(news)
                 break
 
-    return render(request, 'news.html', {'all_news': news_set})
+    return render(request, 'news.html', {
+        'all_news': news_set,
+        'page_title': category + ' News',
+    })
 
 
 def news_by_rule(request, rule_id):
