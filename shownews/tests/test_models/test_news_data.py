@@ -114,8 +114,8 @@ class NewsDataTagsAndKeywordsTest(TestCase):
         tag2 = NewsCategory.objects.create(name='politics')
         tag3 = NewsCategory.objects.create(name='taiwan')
 
-        rule1 = ScrapingRule.objects.create()
-        rule2 = ScrapingRule.objects.create()
+        rule1 = ScrapingRule.objects.create(name='rule1')
+        rule2 = ScrapingRule.objects.create(name='rule2')
 
         rule1.keywords.add(k1, k2)
         rule1.tags.add(tag1, tag2)

@@ -4,7 +4,8 @@ from django.core.urlresolvers import reverse
 
 
 class NewsCategory(models.Model):
-    # Often called "tag" in my program
+    # Note that objects of this class are often called "tag" in the program.
+
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
@@ -30,7 +31,7 @@ class NewsKeyword(models.Model):
 
 
 class ScrapingRule(models.Model):
-    name = models.CharField(max_length=100, default='')
+    name = models.CharField(max_length=100, default='', unique=True)
     active = models.BooleanField(default=True)
     keywords = models.ManyToManyField(NewsKeyword)
     tags = models.ManyToManyField(NewsCategory)

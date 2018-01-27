@@ -45,7 +45,7 @@ class CategoriesPageTest(FunctionalTest):
         tag2 = NewsCategory.objects.create(name=tag_names[1])
 
         # Go to categories page
-        self.browser.get(self.live_server_url + '/categories/')
+        self.browser.get(categories_page_url)
 
         categories_table = self.wait_for(
             lambda: self.browser.find_element_by_id('id_categories_table')
@@ -62,7 +62,7 @@ class CategoriesPageTest(FunctionalTest):
             )
         )
 
-        # Found that url is redirected to /news/category/Finance/
+        # Found that url is redirected to /news/category/tag1.id/
         self.assertEqual(self.browser.current_url, expected_url % (tag1.id))
 
         # Go back to the categories page
@@ -86,7 +86,7 @@ class CategoriesPageTest(FunctionalTest):
             )
         )
 
-        # The url is redirected to /news/category/政治/
+        # The url is redirected to /news/category/tag2.id/
         self.assertEqual(self.browser.current_url, expected_url % (tag2.id))
 
         # Done

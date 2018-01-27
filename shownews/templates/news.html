@@ -4,7 +4,7 @@
 
 {% block  table %}
     <table id="id_news_table" class="table">
-        {% for news in all_news %}
+        {% for news in news_set %}
             <tr>
                 <td class='news_title'>{{ news.title }}</td>
                 <td class='news_url'>{{ news.url }}</td>

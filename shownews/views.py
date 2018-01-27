@@ -9,7 +9,7 @@ def homepage(request):
 
 def news(request):
     return render(request, 'news.html', {
-        'all_news': NewsData.objects.all(),
+        'news_set': NewsData.objects.all(),
         'page_title': 'My Focus News',
     })
 
@@ -30,10 +30,10 @@ def categories(request):
 
 def news_by_category(request, tag_id):
 
-    target_tag = NewsCategory.objects.get(id=tag_id)
+    tag = NewsCategory.objects.get(id=tag_id)
     target_rules = set()
 
-    target_rules.update(target_tag.scrapingrule_set.all())
+    target_rules.update(tag.scrapingrule_set.all())
 
     # print(target_rules)
 
@@ -46,8 +46,8 @@ def news_by_category(request, tag_id):
                 break
 
     return render(request, 'news.html', {
-        'all_news': news_set,
-        'page_title': target_tag.name + ' News',
+        'news_set': news_set,
+        'page_title': tag.name + ' News',
     })
 
 
@@ -56,6 +56,6 @@ def news_by_rule(request, rule_id):
     rule = ScrapingRule.objects.get(id=rule_id)
 
     return render(request, 'news.html', {
-        'all_news': rule.newsdata_set.all(),
+        'news_set': rule.newsdata_set.all(),
         'page_title': rule.name,
     })

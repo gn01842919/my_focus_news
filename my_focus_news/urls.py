@@ -18,7 +18,7 @@ from django.contrib import admin
 from shownews.views import *
 
 news_patterns = [
-    url(r'^$', news),
+    url(r'^$', news, name='all_news'),
     url(r'^category/(\d+)/$', news_by_category, name='news_by_category'),
     url(r'^rule/(\d+)/$', news_by_rule, name='news_by_rule'),
 ]
