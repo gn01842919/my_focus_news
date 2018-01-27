@@ -36,12 +36,19 @@ def news_by_category(request, category):
 
     # print(target_rules)
 
-    result = []
+    news_set = []
 
     for news in NewsData.objects.all():
         for rule in news.rules.all():
             if rule in target_rules:
-                result.append(news)
+                news_set.append(news)
                 break
 
-    return render(request, 'news.html', {'all_news': result})
+    return render(request, 'news.html', {'all_news': news_set})
+
+
+def news_by_rule(request, rule_id):
+
+    rule = ScrapingRule.objects.get(id=rule_id)
+
+    return render(request, 'news.html', {'all_news': rule.newsdata_set.all()})

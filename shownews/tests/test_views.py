@@ -65,7 +65,25 @@ class NewsPageTest(TestCase):
         self.assertContains(response, news2.title)
 
     def test_display_news_for_given_rule_id(self):
-        pass
+        rule1 = ScrapingRule.objects.create()
+        rule2 = ScrapingRule.objects.create()
+        rule3 = ScrapingRule.objects.create()
+        news1 = NewsData.objects.create(title='Title 1', url='http://url1.com')
+        news2 = NewsData.objects.create(title='Title 2', url='http://url2.com')
+        news1.rules.add(rule1, rule3)
+        news2.rules.add(rule2, rule3)
+
+        response = self.client.get('/news/rule/%d/' % rule1.id)
+        self.assertContains(response, news1.title)
+        self.assertNotContains(response, news2.title)
+
+        response = self.client.get('/news/rule/%d/' % rule2.id)
+        self.assertContains(response, news2.title)
+        self.assertNotContains(response, news1.title)
+
+        response = self.client.get('/news/rule/%d/' % rule3.id)
+        self.assertContains(response, news2.title)
+        self.assertContains(response, news1.title)
 
 
 class RulesPageTest(TestCase):

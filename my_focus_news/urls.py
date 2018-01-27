@@ -22,6 +22,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', homepage),
     url(r'^news/', include(news_urls)),
-    url(r'^rules/', rules),
-    url(r'^categories/', categories),
+    url(r'^rules/$', rules),
+    url(r'^categories/$', categories),
 ]
