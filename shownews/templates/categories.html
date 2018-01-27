@@ -6,7 +6,7 @@
     <table id="id_categories_table" class="table">
         {% for tag in all_categories %}
             <tr>
-                <td class='news_category'><a href='{% url 'news_by_category' tag.name %}'>{{ tag.name }}</a></td>
+                <td class='news_category'><a href='{% url 'news_by_category' tag.id %}'>{{ tag.name }}</a></td>
             </tr>
         {% endfor %}
     </table>

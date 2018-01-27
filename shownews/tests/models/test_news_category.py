@@ -16,4 +16,4 @@ class NewsCategoryBasicTest(TestCase):
         rule.tags.add(tag)
         news.rules.add(rule)
 
-        self.assertEqual(tag.get_absolute_url(), '/news/category/%s/' % tag.name)
+        self.assertEqual(tag.get_absolute_url(), '/news/category/%d/' % tag.id)

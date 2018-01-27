@@ -6,7 +6,7 @@ class CategoriesPageTest(FunctionalTest):
 
     def test_can_view_categories(self):
 
-        tag_names = ['Finance', 'Politics']
+        tag_names = ['Finance', '政治']
 
         # Create data for testing
         NewsCategory.objects.create(name=tag_names[0])
@@ -36,9 +36,9 @@ class CategoriesPageTest(FunctionalTest):
 
     def test_click_category_will_show_related_news(self):
 
-        tag_names = ['Finance', 'Politics']
+        tag_names = ['Finance', '政治']
         expected_finance_url = self.live_server_url + '/news/category/Finance/'
-        expected_politics_url = self.live_server_url + '/news/category/Politics/'
+        expected_politics_url = self.live_server_url + '/news/category/政治/'
         expected_categories_page_url = self.live_server_url + '/categories/'
 
         # Create testing data
@@ -76,18 +76,18 @@ class CategoriesPageTest(FunctionalTest):
         # The url is back to /categories/
         self.assertEqual(self.browser.current_url, expected_categories_page_url)
 
-        # Click the "Politics" link
-        categories_table.find_element_by_link_text('Politics').click()
+        # Click the "政治" link
+        categories_table.find_element_by_link_text('政治').click()
 
         # Found the title is different
         self.wait_for(
             lambda: self.assertEqual(
                 self.browser.find_element_by_tag_name('h1').text,
-                'Politics News'
+                '政治 News'
             )
         )
 
-        # The url is redirected to /news/category/Politics/
+        # The url is redirected to /news/category/政治/
         self.assertEqual(self.browser.current_url, expected_politics_url)
 
         # Done

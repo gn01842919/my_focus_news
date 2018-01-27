@@ -4,13 +4,14 @@ from django.core.urlresolvers import reverse
 
 
 class NewsCategory(models.Model):
+    # Often called "tag" in my program
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('news_by_category', args=[self.name])
+        return reverse('news_by_category', args=[self.id])
 
 
 class NewsKeyword(models.Model):

@@ -47,7 +47,7 @@ class NewsPageTest(TestCase):
         # tag3 ==> news2
 
         # Test the page for tag1
-        response = self.client.get('/news/category/%s/' % tag1.name)
+        response = self.client.get('/news/category/%s/' % tag1.id)
         self.assertTemplateUsed(response, 'news.html')
         self.assertIsInstance(response.context['all_news'][0], NewsData)
         self.assertIsInstance(response.context['all_news'][1], NewsData)
@@ -55,12 +55,12 @@ class NewsPageTest(TestCase):
         self.assertContains(response, news2.title)
 
         # Test the page for tag2
-        response = self.client.get('/news/category/%s/' % tag2.name)
+        response = self.client.get('/news/category/%s/' % tag2.id)
         self.assertContains(response, news1.title)
         self.assertNotContains(response, news2.title)
 
         # Test the page for tag3
-        response = self.client.get('/news/category/%s/' % tag3.name)
+        response = self.client.get('/news/category/%s/' % tag3.id)
         self.assertNotContains(response, news1.title)
         self.assertContains(response, news2.title)
 
