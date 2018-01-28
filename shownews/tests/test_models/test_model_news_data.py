@@ -1,7 +1,7 @@
 from django.test import TestCase
 from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
 import pytz
@@ -25,16 +25,60 @@ class NewsDataBasicTest(TestCase):
         self.assertEqual(news.rules.first(), rule)
 
     def test_ordering(self):
+        """
+        News should be ordered by:
+            1. time (time of the news) (from new to old)
+            2. creation_time
+        """
+        num = 10
+        titles = ['title_%s' % i for i in range(num)]
+        urls = ['http://%s.com' % title for title in titles]
+        base_time = timezone.now() - timedelta(days=num)
+        time_list = [base_time + timedelta(days=i) for i in range(num)]
 
-        news1 = NewsData.objects.create(title='t1', url='http://u1.com')
-        news2 = NewsData.objects.create(title='t2', url='http://u2.com')
-        news3 = NewsData.objects.create(title='t3', url='http://u3.com')
+        news_data = [
+            NewsData.objects.create(
+                title=titles[0], url=urls[0]
+            ),
+            NewsData.objects.create(
+                title=titles[1], url=urls[1], read_time=time_list[3]
+            ),
+            NewsData.objects.create(
+                title=titles[2], url=urls[2], time=time_list[5]
+            ),
+            NewsData.objects.create(
+                title=titles[3], url=urls[3], time=time_list[2]
+            ),
+            NewsData.objects.create(
+                title=titles[4], url=urls[4], time=time_list[0]
+            ),
+            NewsData.objects.create(
+                title=titles[5], url=urls[5], time=time_list[4]
+            ),
+            NewsData.objects.create(
+                title=titles[6], url=urls[6], read_time=time_list[1]
+            ),
+            NewsData.objects.create(
+                title=titles[7], url=urls[7], time=time_list[5]
+            ),
+        ]
 
-        self.assertEqual(news1.title, 't1')
-        self.assertEqual(news1.url, 'http://u1.com')
+        expected_ordering = [
+            news_data[6],
+            news_data[1],
+            news_data[0],
+            news_data[7],
+            news_data[2],
+            news_data[5],
+            news_data[3],
+            news_data[4],
+        ]
+
+        saved_news = NewsData.objects.all()
+
         self.assertEqual(
-            list(NewsData.objects.all()),
-            [news1, news2, news3]
+            list(saved_news),
+            expected_ordering
         )
 
 

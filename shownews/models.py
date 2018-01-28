@@ -64,3 +64,6 @@ class NewsData(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ['-time', '-creation_time']
