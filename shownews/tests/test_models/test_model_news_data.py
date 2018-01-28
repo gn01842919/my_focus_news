@@ -7,6 +7,51 @@ from django.core.exceptions import ValidationError
 import pytz
 
 
+def create_news_data_with_ordering():
+
+    num = 10
+    titles = ['title_%s' % i for i in range(num)]
+    urls = ['http://%s.com' % title for title in titles]
+    base_time = timezone.now() - timedelta(days=num)
+    time_list = [base_time + timedelta(days=i) for i in range(num)]
+
+    news_data = [
+        NewsData.objects.create(
+            title=titles[0], url=urls[0]
+        ),
+        NewsData.objects.create(
+            title=titles[1], url=urls[1], time=time_list[5]
+        ),
+        NewsData.objects.create(
+            title=titles[2], url=urls[2], time=time_list[2]
+        ),
+        NewsData.objects.create(
+            title=titles[3], url=urls[3], time=time_list[0]
+        ),
+        NewsData.objects.create(
+            title=titles[4], url=urls[4], time=time_list[4]
+        ),
+        NewsData.objects.create(
+            title=titles[5], url=urls[5], read_time=time_list[1]
+        ),
+        NewsData.objects.create(
+            title=titles[6], url=urls[6], time=time_list[5]
+        ),
+    ]
+
+    expected_ordering = [
+        news_data[5],
+        news_data[0],
+        news_data[6],
+        news_data[1],
+        news_data[4],
+        news_data[2],
+        news_data[3],
+    ]
+
+    return news_data, expected_ordering
+
+
 class NewsDataBasicTest(TestCase):
 
     def test_can_save_and_retrive(self):
@@ -30,45 +75,8 @@ class NewsDataBasicTest(TestCase):
             1. time (time of the news) (from new to old)
             2. creation_time
         """
-        num = 10
-        titles = ['title_%s' % i for i in range(num)]
-        urls = ['http://%s.com' % title for title in titles]
-        base_time = timezone.now() - timedelta(days=num)
-        time_list = [base_time + timedelta(days=i) for i in range(num)]
 
-        news_data = [
-            NewsData.objects.create(
-                title=titles[0], url=urls[0]
-            ),
-            NewsData.objects.create(
-                title=titles[1], url=urls[1], time=time_list[5]
-            ),
-            NewsData.objects.create(
-                title=titles[2], url=urls[2], time=time_list[2]
-            ),
-            NewsData.objects.create(
-                title=titles[3], url=urls[3], time=time_list[0]
-            ),
-            NewsData.objects.create(
-                title=titles[4], url=urls[4], time=time_list[4]
-            ),
-            NewsData.objects.create(
-                title=titles[5], url=urls[5], read_time=time_list[1]
-            ),
-            NewsData.objects.create(
-                title=titles[6], url=urls[6], time=time_list[5]
-            ),
-        ]
-
-        expected_ordering = [
-            news_data[5],
-            news_data[0],
-            news_data[6],
-            news_data[1],
-            news_data[4],
-            news_data[2],
-            news_data[3],
-        ]
+        news_data, expected_ordering = create_news_data_with_ordering()
 
         saved_news = NewsData.objects.all()
 

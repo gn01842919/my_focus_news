@@ -1,5 +1,6 @@
 from django.test import TestCase
 from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
+from shownews.tests.test_models.test_model_news_data import create_news_data_with_ordering
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from datetime import datetime
@@ -48,6 +49,78 @@ class AllNewsPageTest(TestCase):
         for i, news in enumerate(news_data):
             self.assertIsInstance(response.context['news_set'][i], NewsData)
             self.assertContains(response, news.title)
+
+    def test_ordering(self):
+
+        news_data, expected_ordering = create_news_data_with_ordering()
+
+        response = self.client.get(reverse('all_news'))
+        responsed_news = response.context['news_set']
+
+        self.assertEqual(len(responsed_news), len(expected_ordering))
+        self.assertEqual(list(responsed_news), expected_ordering)
+
+
+class UnreadNewsTest(TestCase):
+
+    def test_template_used(self):
+        response = self.client.get(reverse('unread_news'))
+        self.assertTemplateUsed(response, 'news.html')
+
+    def test_displays_only_unread_news(self):
+
+        time1 = datetime(2017, 7, 4, 12, 30, 51, tzinfo=pytz.UTC)
+        time2 = timezone.now()
+
+        news = [
+            NewsData.objects.create(
+                title='Title 1', url='http://url1.com'
+            ),
+            NewsData.objects.create(
+                title='Title 2', url='http://url2.com', read_time=time1
+            ),
+            NewsData.objects.create(
+                title='Title 3', url='http://url3.com', read_time=time2
+            ),
+            NewsData.objects.create(
+                title='Title 4', url='http://url4.com'
+            ),
+        ]
+
+        response = self.client.get(reverse('unread_news'))
+
+        self.assertEqual(len(response.context['news_set']), 2)
+
+        self.assertContains(response, news[0].title)
+        self.assertNotContains(response, news[1].title)
+        self.assertNotContains(response, news[2].title)
+        self.assertContains(response, news[3].title)
+
+    def test_news_data_are_marked_as_read_once_shown_on_the_page(self):
+        news1 = NewsData.objects.create(title='Title 1', url='http://url1.com')
+        news2 = NewsData.objects.create(title='Title 2', url='http://url2.com')
+
+        self.assertIsNone(news1.read_time)
+        self.assertIsNone(news2.read_time)
+
+        self.client.get(reverse('unread_news'))
+
+        # read_time is not None means that it has been read
+        saved_news = NewsData.objects.all()
+        self.assertIsNotNone(saved_news[0].read_time)
+        self.assertIsNotNone(saved_news[1].read_time)
+
+    def test_ordering(self):
+
+        news_data, expected_ordering = create_news_data_with_ordering()
+
+        response = self.client.get(reverse('unread_news'))
+        responsed_news = response.context['news_set']
+
+        expected_ordering = [news for news in expected_ordering if not news.read_time]
+
+        self.assertEqual(len(responsed_news), len(expected_ordering))
+        self.assertEqual(list(responsed_news), expected_ordering)
 
 
 class SpecifiedNewsTest(TestCase):
@@ -141,56 +214,6 @@ class SpecifiedNewsTest(TestCase):
         self.assertEqual(len(response.context['news_set']), 2)
         self.assertContains(response, news2.title)
         self.assertContains(response, news1.title)
-
-
-class UnreadNewsTest(TestCase):
-
-    def test_template_used(self):
-        response = self.client.get(reverse('unread_news'))
-        self.assertTemplateUsed(response, 'news.html')
-
-    def test_displays_only_unread_news(self):
-
-        time1 = datetime(2017, 7, 4, 12, 30, 51, tzinfo=pytz.UTC)
-        time2 = timezone.now()
-
-        news = [
-            NewsData.objects.create(
-                title='Title 1', url='http://url1.com'
-            ),
-            NewsData.objects.create(
-                title='Title 2', url='http://url2.com', read_time=time1
-            ),
-            NewsData.objects.create(
-                title='Title 3', url='http://url3.com', read_time=time2
-            ),
-            NewsData.objects.create(
-                title='Title 4', url='http://url4.com'
-            ),
-        ]
-
-        response = self.client.get(reverse('unread_news'))
-
-        self.assertEqual(len(response.context['news_set']), 2)
-
-        self.assertContains(response, news[0].title)
-        self.assertNotContains(response, news[1].title)
-        self.assertNotContains(response, news[2].title)
-        self.assertContains(response, news[3].title)
-
-    def test_news_data_are_marked_as_read_once_shown_on_the_page(self):
-        news1 = NewsData.objects.create(title='Title 1', url='http://url1.com')
-        news2 = NewsData.objects.create(title='Title 2', url='http://url2.com')
-
-        self.assertIsNone(news1.read_time)
-        self.assertIsNone(news2.read_time)
-
-        self.client.get(reverse('unread_news'))
-
-        # read_time is not None means that it has been read
-        saved_news = NewsData.objects.all()
-        self.assertIsNotNone(saved_news[0].read_time)
-        self.assertIsNotNone(saved_news[1].read_time)
 
 
 class RulesPageTest(TestCase):
