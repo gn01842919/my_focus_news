@@ -17,7 +17,7 @@ def create_news_data_with_ordering():
 
     news_data = [
         NewsData.objects.create(
-            title=titles[0], url=urls[0]
+            title=titles[0], url=urls[0],
         ),
         NewsData.objects.create(
             title=titles[1], url=urls[1], time=time_list[5]
@@ -38,6 +38,12 @@ def create_news_data_with_ordering():
             title=titles[6], url=urls[6], time=time_list[5]
         ),
     ]
+
+    # Adjust creation_time because all may be created within 1 second...
+    news_data[0].creation_time -= timedelta(days=1)
+    news_data[0].save()
+    news_data[1].creation_time -= timedelta(days=1)
+    news_data[1].save()
 
     expected_ordering = [
         news_data[5],
