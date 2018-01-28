@@ -1,6 +1,9 @@
 from django.test import TestCase
 from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
 from django.core.urlresolvers import reverse
+from django.utils import timezone
+from datetime import datetime
+import pytz
 
 
 class HomepageTest(TestCase):
@@ -12,18 +15,15 @@ class HomepageTest(TestCase):
 
 class NewsPageTest(TestCase):
 
-    def test_template_used(self):
-        response = self.client.get(reverse('all_news'))
-        self.assertTemplateUsed(response, 'news.html')
-        response = self.client.get(reverse('unread_news'))
-        self.assertTemplateUsed(response, 'news.html')
-
     def test_displays_all_the_news(self):
         NewsData.objects.create(title='Title 1', url='http://url1.com')
         NewsData.objects.create(title='Title 2', url='http://url2.com')
 
         response = self.client.get(reverse('all_news'))
 
+        self.assertTemplateUsed(response, 'news.html')
+
+        self.assertEqual(len(response.context['news_set']), 2)
         self.assertContains(response, 'Title 1')
         self.assertContains(response, 'Title 2')
         self.assertIsInstance(response.context['news_set'][0], NewsData)
@@ -48,19 +48,24 @@ class NewsPageTest(TestCase):
 
         # Test the page for tag1
         response = self.client.get(tag1.get_absolute_url())
+
         self.assertTemplateUsed(response, 'news.html')
+
         self.assertIsInstance(response.context['news_set'][0], NewsData)
         self.assertIsInstance(response.context['news_set'][1], NewsData)
+        self.assertEqual(len(response.context['news_set']), 2)
         self.assertContains(response, news1.title)
         self.assertContains(response, news2.title)
 
         # Test the page for tag2
         response = self.client.get(tag2.get_absolute_url())
+        self.assertEqual(len(response.context['news_set']), 1)
         self.assertContains(response, news1.title)
         self.assertNotContains(response, news2.title)
 
         # Test the page for tag3
         response = self.client.get(tag3.get_absolute_url())
+        self.assertEqual(len(response.context['news_set']), 1)
         self.assertNotContains(response, news1.title)
         self.assertContains(response, news2.title)
 
@@ -74,16 +79,58 @@ class NewsPageTest(TestCase):
         news2.rules.add(rule2, rule3)
 
         response = self.client.get(rule1.get_absolute_url())
+
+        self.assertTemplateUsed(response, 'news.html')
+
+        self.assertEqual(len(response.context['news_set']), 1)
         self.assertContains(response, news1.title)
         self.assertNotContains(response, news2.title)
 
         response = self.client.get(rule2.get_absolute_url())
+        self.assertEqual(len(response.context['news_set']), 1)
         self.assertContains(response, news2.title)
         self.assertNotContains(response, news1.title)
 
         response = self.client.get(rule3.get_absolute_url())
+        self.assertEqual(len(response.context['news_set']), 2)
         self.assertContains(response, news2.title)
         self.assertContains(response, news1.title)
+
+    def test_displays_only_unread_news(self):
+
+        time1 = datetime(2017, 7, 4, 12, 30, 51, tzinfo=pytz.UTC)
+        time2 = timezone.now()
+
+        news1 = NewsData.objects.create(title='Title 1', url='http://url1.com')
+        news2 = NewsData.objects.create(title='Title 2', url='http://url2.com', read_time=time1)
+        news3 = NewsData.objects.create(title='Title 3', url='http://url3.com', read_time=time2)
+        news4 = NewsData.objects.create(title='Title 4', url='http://url4.com')
+
+        response = self.client.get(reverse('unread_news'))
+
+        self.assertTemplateUsed(response, 'news.html')
+
+        self.assertEqual(len(response.context['news_set']), 2)
+        self.assertContains(response, news1.title)
+        self.assertNotContains(response, news2.title)
+        self.assertNotContains(response, news3.title)
+        self.assertContains(response, news4.title)
+
+    def test_news_data_are_marked_as_read_once_shown_on_the_page(self):
+        news1 = NewsData.objects.create(title='Title 1', url='http://url1.com')
+        news2 = NewsData.objects.create(title='Title 2', url='http://url2.com')
+
+        self.assertIsNone(news1.read_time)
+        self.assertIsNone(news2.read_time)
+
+        self.client.get(reverse('unread_news'))
+
+        # read_time is not None means that it has been read
+        saved_news = NewsData.objects.all()
+        self.assertIsNotNone(saved_news[0].read_time)
+        self.assertIsNotNone(saved_news[1].read_time)
+
+
 
 
 class RulesPageTest(TestCase):

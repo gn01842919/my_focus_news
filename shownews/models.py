@@ -53,9 +53,10 @@ class ScrapingRule(models.Model):
 
 
 class NewsData(models.Model):
-    title = models.TextField()
+    title = models.TextField(default='')
     url = models.URLField(unique=True)
     time = models.DateTimeField(default=timezone.now)
+    read_time = models.DateTimeField(null=True, blank=True)
     creation_time = models.DateTimeField(auto_now_add=True)
     last_modified_time = models.DateTimeField(auto_now=True)
     # The rules which created this news

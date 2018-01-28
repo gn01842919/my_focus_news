@@ -15,15 +15,13 @@ class NewsDataBasicTest(TestCase):
         news.title = 'A Breaking News'
         news.url = 'http://www.google.com'
         news.time = timezone.now()
+        news.read_time = timezone.now()
         news.save()
         rule = ScrapingRule.objects.create()
         news.rules.add(rule)
 
-        saved_news = NewsData.objects.all()
-        self.assertEqual(news.title, saved_news[0].title)
-        self.assertEqual(news.url, saved_news[0].url)
-        self.assertEqual(news.time, saved_news[0].time)
-        self.assertEqual(news, saved_news[0])
+        saved_news = NewsData.objects.first()
+        self.assertEqual(news, saved_news)
         self.assertEqual(news.rules.first(), rule)
 
     def test_ordering(self):
@@ -95,8 +93,16 @@ class NewsDataInputValueTest(TestCase):
 
         # time can be retrieved as a datetime object
         # Note that saved_time is of UTC timezone according to settings.py
-        saved_time = NewsData.objects.all()[0].time
+        saved_time = NewsData.objects.first().time
         self.assertEqual(saved_time.strftime("%Y/%m/%d %H:%M:%S"), "2015/07/04 12:30:51")
+
+    def test_read_time_can_be_empty(self):
+        news = NewsData()
+        news.title = 'Title'
+        # read_time attribute is not set
+        news.url = 'http://url1.com'
+        news.save()
+        news.full_clean()  # should not raise
 
 
 class NewsDataTagsAndKeywordsTest(TestCase):

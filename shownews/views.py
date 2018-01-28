@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from shownews.models import NewsData, ScrapingRule, NewsCategory
+from django.utils import timezone
 
 
 # Create your views here.
@@ -8,8 +9,17 @@ def homepage(request):
 
 
 def unread_news(request):
+
+    unread_news = NewsData.objects.filter(read_time__isnull=True)
+
+    curr_time = timezone.now()
+
+    for news in unread_news:
+        news.read_time = curr_time
+        news.save()
+
     return render(request, 'news.html', {
-        'news_set': NewsData.objects.all(),
+        'news_set': unread_news,
         'page_title': 'Unread Focus News',
     })
 
