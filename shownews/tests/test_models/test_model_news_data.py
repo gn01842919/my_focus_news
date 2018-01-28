@@ -1,10 +1,10 @@
 from django.test import TestCase
-from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
 from django.utils import timezone
-from datetime import datetime, timedelta
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+from datetime import datetime, timedelta
 import pytz
+from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
 
 
 def create_news_data_with_ordering():

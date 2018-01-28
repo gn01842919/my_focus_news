@@ -1,6 +1,5 @@
 from .base import FunctionalTest
 from shownews.models import ScrapingRule, NewsKeyword, NewsData
-# from unittest import skip
 
 
 class RulesPageTest(FunctionalTest):

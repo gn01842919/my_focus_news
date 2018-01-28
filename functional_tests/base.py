@@ -1,5 +1,5 @@
-from selenium import webdriver
 from django.contrib.staticfiles.testing import LiveServerTestCase
+from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from datetime import datetime
 import time

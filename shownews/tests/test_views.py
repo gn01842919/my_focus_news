@@ -1,10 +1,10 @@
 from django.test import TestCase
-from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
-from shownews.tests.test_models.test_model_news_data import create_news_data_with_ordering
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from datetime import datetime
 import pytz
+from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
+from shownews.tests.test_models.test_model_news_data import create_news_data_with_ordering
 
 
 class HomepageTest(TestCase):
@@ -16,8 +16,11 @@ class HomepageTest(TestCase):
 
 class AllNewsPageTest(TestCase):
 
+    def setUp(self):
+        self.target_url = reverse('all_news')
+
     def test_template_used(self):
-        response = self.client.get(reverse('all_news'))
+        response = self.client.get(self.target_url)
         self.assertTemplateUsed(response, 'news.html')
 
     def test_displays_all_the_news(self):
@@ -42,7 +45,7 @@ class AllNewsPageTest(TestCase):
             ),
         ]
 
-        response = self.client.get(reverse('all_news'))
+        response = self.client.get(self.target_url)
 
         self.assertEqual(len(response.context['news_set']), 4)
 
@@ -54,7 +57,7 @@ class AllNewsPageTest(TestCase):
 
         news_data, expected_ordering = create_news_data_with_ordering()
 
-        response = self.client.get(reverse('all_news'))
+        response = self.client.get(self.target_url)
         responsed_news = response.context['news_set']
 
         self.assertEqual(len(responsed_news), len(expected_ordering))
@@ -63,8 +66,11 @@ class AllNewsPageTest(TestCase):
 
 class UnreadNewsTest(TestCase):
 
+    def setUp(self):
+        self.target_url = reverse('unread_news')
+
     def test_template_used(self):
-        response = self.client.get(reverse('unread_news'))
+        response = self.client.get(self.target_url)
         self.assertTemplateUsed(response, 'news.html')
 
     def test_displays_only_unread_news(self):
@@ -87,7 +93,7 @@ class UnreadNewsTest(TestCase):
             ),
         ]
 
-        response = self.client.get(reverse('unread_news'))
+        response = self.client.get(self.target_url)
 
         self.assertEqual(len(response.context['news_set']), 2)
 
@@ -103,7 +109,7 @@ class UnreadNewsTest(TestCase):
         self.assertIsNone(news1.read_time)
         self.assertIsNone(news2.read_time)
 
-        self.client.get(reverse('unread_news'))
+        self.client.get(self.target_url)
 
         # read_time is not None means that it has been read
         saved_news = NewsData.objects.all()
@@ -114,7 +120,7 @@ class UnreadNewsTest(TestCase):
 
         news_data, expected_ordering = create_news_data_with_ordering()
 
-        response = self.client.get(reverse('unread_news'))
+        response = self.client.get(self.target_url)
         responsed_news = response.context['news_set']
 
         expected_ordering = [news for news in expected_ordering if not news.read_time]
@@ -218,6 +224,9 @@ class SpecifiedNewsTest(TestCase):
 
 class RulesPageTest(TestCase):
 
+    def setUp(self):
+        self.target_url = reverse('rules')
+
     def test_template_used(self):
         response = self.client.get(reverse('rules'))
         self.assertTemplateUsed(response, 'rules.html')
@@ -237,7 +246,7 @@ class RulesPageTest(TestCase):
         rule2.keywords.add(keyword2, keyword3)
         rule2.tags.add(tag1, tag2)
 
-        response = self.client.get(reverse('rules'))
+        response = self.client.get(self.target_url)
 
         self.assertIsInstance(response.context['all_rules'][0], ScrapingRule)
         self.assertIsInstance(response.context['all_rules'][1], ScrapingRule)
@@ -252,6 +261,9 @@ class RulesPageTest(TestCase):
 
 class CategoriesPageTest(TestCase):
 
+    def setUp(self):
+        self.target_url = reverse('categories')
+
     def test_template_used(self):
         response = self.client.get(reverse('categories'))
         self.assertTemplateUsed(response, 'categories.html')
@@ -260,7 +272,7 @@ class CategoriesPageTest(TestCase):
         NewsCategory.objects.create(name='tag1')
         NewsCategory.objects.create(name='tag2')
 
-        response = self.client.get(reverse('categories'))
+        response = self.client.get(self.target_url)
 
         self.assertIsInstance(response.context['all_categories'][0], NewsCategory)
         self.assertIsInstance(response.context['all_categories'][1], NewsCategory)

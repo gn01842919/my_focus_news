@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
-from shownews.models import NewsData, ScrapingRule, NewsCategory
 from django.utils import timezone
-
+from shownews.models import NewsData, ScrapingRule, NewsCategory
 
 # Create your views here.
 def homepage(request):
