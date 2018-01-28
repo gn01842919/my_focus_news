@@ -54,11 +54,6 @@
               To-Do
 ====================================
 
-0. 寫確認 CSS 有載入的FT，要讓它過需要改用 staticliveservertestcase
-
-(目前的 FT 其實沒有載入 CSS)
-
-
 1. 註冊與登入
 
 2. /news/recently-read/3/  <---- 最近三天內的新聞
