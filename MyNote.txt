@@ -1,6 +1,70 @@
+
+
 ====================================
-     在 Windows 10 上安裝與設置
+             疑難雜症
 ====================================
+
+
+
+====================================
+              To-Do
+====================================
+
+1. 註冊與登入
+
+2. /news/recently-read/3/  <---- 最近三天內的新聞
+
+3. /rules/ 與 /categories/ 可編輯
+
+4. /settings/ ==> 例如資料庫的東西要保留幾天? 或是 scrapper 的一些設定
+
+5. 英文中文分開?  多個 en / zh 參數之類的
+
+
+
+
+
+==================================================
+      Ubuntu 上開發環境設定 (移植自 Windows)
+==================================================
+
+1. Lubuntu 裝好 Python3, virtualenv, git
+
+2. 使用 virtualenv
+
+    (普通使用者)
+    cd ~/projects
+    git clone https://github.com/gn01842919/my_focus_news.git
+    cd my_focus_news
+    virtualenv --python=python3 ./virtualenv
+
+3. 安裝相依套件
+
+    <方法一>
+        啟用虛擬環境:
+           source ./virtualenv/bin/activate
+
+        在虛擬環境中，安裝相依套件:
+            pip install "django<2" selenium pytz
+
+    <方法二>
+        不進入虛擬環境，直接安裝
+            ~/projects/my_focus_news/virtualenv/bin/pip install "django<2" selenium pytz
+
+4. 搞定 geckodriver (for selenium)
+    (參考: https://stackoverflow.com/questions/40208051/selenium-using-python-geckodriver-executable-needs-to-be-in-path )
+    a.   下載最新版的 geckodriver
+    b.   cd ~/projects/my_focus_news; mkdir tools; mv ~/geckodriver tools/
+    c.   echo 'PATH="$PATH:$HOME/projects/my_focus_news/tools/"' >> ~/.profile
+    d.   重新登入，確認 $PATH 有吃到剛才指定的位置
+
+5. 確認可以所有測試都能通過
+
+    virtualenv/bin/python manage.py test
+
+===========================================
+     在 Windows 10 上安裝與設置 (初始環境)
+===========================================
 
 1. 安裝 Django, Selenium, Firefox, MySQL
     * Selenium 3 需要一個叫做 gekodriver 的東西
@@ -39,30 +103,7 @@
 6. 到 my_focus_news/settings.py 的 INSTALLED_APPS 部份加上:
 
     'shownews',
-    
+
 7. 預設 shownews 資料夾底下會有一個 tests.py，如果自己弄一個資料夾把測試放裡面的話，這個預設的記得刪掉
-    
+
 8. commit code
-
-====================================
-             疑難雜症
-====================================
-
-
-
-====================================
-              To-Do
-====================================
-
-1. 註冊與登入
-
-2. /news/recently-read/3/  <---- 最近三天內的新聞
-
-3. /rules/ 與 /categories/ 可編輯
-
-4. /settings/ ==> 例如資料庫的東西要保留幾天? 或是 scrapper 的一些設定
-
-5. 英文中文分開?  多個 en / zh 參數之類的
-
-
-
