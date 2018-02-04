@@ -96,10 +96,17 @@ https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your
                 'NAME': 'my_focus_news',
                 'USER': 'dja1',
                 'PASSWORD': '123456',
-                'HOST': 'localhost',
+                'HOST': 'db',
                 'PORT': '',
             }
         }
+
+8. sudo vi /etc/hosts
+
+    修改第一行:
+        127.0.0.1       localhost
+    在 localhost 後面加上 db:
+        127.0.0.1       localhost db
 
 ====================================================
     被捨棄的部分 - Linux 上使用 MySQL 來搭配 Django

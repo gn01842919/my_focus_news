@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': 'my_focus_news',
         'USER': 'dja1',
         'PASSWORD': 'aeSDd~ftR53F',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '',
     }
 }
