@@ -53,10 +53,9 @@
 
 4. 搞定 geckodriver (for selenium)
     (參考: https://stackoverflow.com/questions/40208051/selenium-using-python-geckodriver-executable-needs-to-be-in-path )
-    a.   下載最新版的 geckodriver
-    b.   cd ~/projects/my_focus_news; mkdir tools; mv ~/geckodriver tools/
-    c.   echo 'PATH="$PATH:$HOME/projects/my_focus_news/tools/"' >> ~/.profile
-    d.   重新登入，確認 $PATH 有吃到剛才指定的位置
+    a.   下載最新版的 geckodriver，放到 ~/mytools/
+    b.   echo 'PATH="$PATH:$HOME/mytools/"' >> ~/.profile
+    c.   重新登入，確認 $PATH 有吃到剛才指定的位置
 
 5. 確認可以所有測試都能通過
 
@@ -69,6 +68,38 @@
     git push -u origin master
     輸入帳號密碼時，要加上 @gmial.com
 
+7. 安裝 PostgreSQL
+參考:
+https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-16-04
+
+    a. 安裝並設定 postgresql (密碼記得換)
+
+        apt-get install postgresql postgresql-contrib libpq-dev
+
+        sudo -u postgres psql
+        CREATE DATABASE my_focus_news;
+        CREATE USER dja1 WITH PASSWORD '123456';
+        ALTER ROLE dja1 SET client_encoding TO 'utf8';
+        ALTER ROLE dja1 SET default_transaction_isolation TO 'read committed';
+        ALTER ROLE dja1 SET timezone TO 'UTC';
+        GRANT ALL PRIVILEGES ON DATABASE my_focus_news TO dja1;
+        ALTER USER dja1 CREATEDB;
+        \q
+
+    b. 進入 Virtualenv，執行 pip install psycopg2
+
+    c. 修改 Settings.py
+
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': 'my_focus_news',
+                'USER': 'dja1',
+                'PASSWORD': '123456',
+                'HOST': 'localhost',
+                'PORT': '',
+            }
+        }
 
 ====================================================
     被捨棄的部分 - Linux 上使用 MySQL 來搭配 Django
@@ -90,19 +121,19 @@
 
     建立 Django 要用的使用者並給予權限:
 
-            CREATE USER 'django'@'localhost' IDENTIFIED BY 'secure_password_here';
-            GRANT ALL PRIVILEGES ON my_focus_news.* TO django@'localhost';
-            GRANT ALL PRIVILEGES ON test_my_focus_news.* TO django@'localhost';
-            FLUSH PRIVILEGES;
-            QUIT;
+        CREATE USER 'dj1'@'localhost' IDENTIFIED BY 'secure_password_here';
+        GRANT ALL PRIVILEGES ON my_focus_news.* TO dj1@'localhost';
+        GRANT ALL PRIVILEGES ON test_my_focus_news.* TO dj1@'localhost';
+        FLUSH PRIVILEGES;
+        QUIT;
 
     之後更改 Django 的設定黨，讓他改用 MySQL
 
-6. 安裝 mysql-connector-python
+8. 安裝 mysql-connector-python
 
     ~/projects/my_focus_news/virtualenv/bin/pip install mysql-connector-python
 
-7. 執行 python manage.py test shownews 時，不停遇到以下錯誤:
+9. 執行 python manage.py test shownews 時，不停遇到以下錯誤:
 
     django.db.utils.ProgrammingError: Specified key was too long; max key length is 767 bytes
 
@@ -110,14 +141,14 @@
 
     最後決定放棄
 
-8. 放棄時的 settings.py 更改過的設定如下:
+10. 放棄時的 settings.py 更改過的設定如下:
 
     DATABASES = {
         'default': {
             'ENGINE': 'mysql.connector.django',
             'NAME': 'my_focus_news',
-            'USER': 'django',
-            'PASSWORD': 'A1~kdcv33Rre3@r3',
+            'USER': 'dj1',
+            'PASSWORD': 'secure_password_here',
             'HOST': 'localhost',
             'PORT': '',
         }

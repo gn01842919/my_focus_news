@@ -22,27 +22,32 @@ class ScrapingRuleBasicTest(TestCase):
         # another rule
         rule2.keywords.add(keyword2, keyword3)
 
-        saved_rules = ScrapingRule.objects.all()
+        # saved_rules = ScrapingRule.objects.all()
 
-        self.assertEqual(rule1, saved_rules[0])
+        self.assertEqual(ScrapingRule.objects.count(), 2)
+
+        saved_rule_1 = ScrapingRule.objects.get(id=rule1.id)
+        saved_rule_2 = ScrapingRule.objects.get(id=rule2.id)
+
+        self.assertEqual(rule1, saved_rule_1)
 
         # same keyword objects will appear only once
-        self.assertEqual(saved_rules[0].keywords.count(), 3)
+        self.assertEqual(saved_rule_1.keywords.count(), 3)
 
         # Can retrieve the first keyword
-        self.assertEqual(saved_rules[0].keywords.all()[0], keyword1)
+        self.assertEqual(saved_rule_1.keywords.get(id=keyword1.id), keyword1)
 
         # Can retrieve the second keyword
-        self.assertEqual(saved_rules[0].keywords.all()[1], keyword2)
+        self.assertEqual(saved_rule_1.keywords.get(id=keyword2.id), keyword2)
 
         # The rule is active by default
-        self.assertTrue(saved_rules[0].active)
+        self.assertTrue(saved_rule_1.active)
 
         # The whole rule is correct
         self.assertEqual(
-            saved_rules[0].details,
+            saved_rule_1.details,
             "<Rule %d> [Active] Include (keyword1, keyword3), Exclude (keyword2), "
-            "Tags (finance, politics)" % saved_rules[0].id
+            "Tags (finance, politics)" % saved_rule_1.id
         )
 
         # Check that active can be set to False
@@ -50,19 +55,23 @@ class ScrapingRuleBasicTest(TestCase):
         rule1.full_clean()
         rule1.save()
 
-        saved_rules = ScrapingRule.objects.all()
-        self.assertEqual(saved_rules[0].keywords.count(), 3)
-        self.assertFalse(saved_rules[0].active)
+        self.assertEqual(ScrapingRule.objects.count(), 2)
+
+        saved_rule_1 = ScrapingRule.objects.get(id=rule1.id)
+        saved_rule_2 = ScrapingRule.objects.get(id=rule2.id)
+
+        self.assertEqual(saved_rule_1.keywords.count(), 3)
+        self.assertFalse(saved_rule_1.active)
 
         self.assertEqual(
-            saved_rules[0].details,
+            saved_rule_1.details,
             "<Rule %d> [Inactive] Include (keyword1, keyword3), "
-            "Exclude (keyword2), Tags (finance, politics)" % saved_rules[0].id
+            "Exclude (keyword2), Tags (finance, politics)" % saved_rule_1.id
         )
         self.assertEqual(
-            saved_rules[1].details,
+            saved_rule_2.details,
             "<Rule %d> [Active] Include (keyword3), "
-            "Exclude (keyword2), Tags (politics)" % saved_rules[1].id
+            "Exclude (keyword2), Tags (politics)" % saved_rule_2.id
         )
 
     def test_get_news_url(self):
