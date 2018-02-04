@@ -69,6 +69,60 @@
     git push -u origin master
     輸入帳號密碼時，要加上 @gmial.com
 
+
+====================================================
+    被捨棄的部分 - Linux 上使用 MySQL 來搭配 Django
+====================================================
+
+
+7. 安裝 MySQL
+
+    sudo apt-get udpate
+    sudo apt-get install mariadb-server mariadb-client
+    sudo mysql_secure_installation
+
+    必須用 linux 的 root 帳號，才能以 root 登入 mysql:
+        sudo mysql -u root -p
+
+    進入 MySQL shell 之後，建立一個 Database:
+        CREATE DATABASE my_focus_news;
+        ALTER DATABASE `my_focus_news` CHARACTER SET utf8;
+
+    建立 Django 要用的使用者並給予權限:
+
+            CREATE USER 'django'@'localhost' IDENTIFIED BY 'secure_password_here';
+            GRANT ALL PRIVILEGES ON my_focus_news.* TO django@'localhost';
+            GRANT ALL PRIVILEGES ON test_my_focus_news.* TO django@'localhost';
+            FLUSH PRIVILEGES;
+            QUIT;
+
+    之後更改 Django 的設定黨，讓他改用 MySQL
+
+6. 安裝 mysql-connector-python
+
+    ~/projects/my_focus_news/virtualenv/bin/pip install mysql-connector-python
+
+7. 執行 python manage.py test shownews 時，不停遇到以下錯誤:
+
+    django.db.utils.ProgrammingError: Specified key was too long; max key length is 767 bytes
+
+    試過許多方法皆無法解決，包括 https://github.com/nephila/djangocms-page-meta
+
+    最後決定放棄
+
+8. 放棄時的 settings.py 更改過的設定如下:
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'mysql.connector.django',
+            'NAME': 'my_focus_news',
+            'USER': 'django',
+            'PASSWORD': 'A1~kdcv33Rre3@r3',
+            'HOST': 'localhost',
+            'PORT': '',
+        }
+    }
+
 ===========================================
      在 Windows 10 上安裝與設置 (初始環境)
 ===========================================
