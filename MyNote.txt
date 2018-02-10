@@ -23,6 +23,77 @@
 
 
 
+========================================================
+                  開發 / 執行測試
+========================================================
+
+1. 以普通使用者 (kyan) 登入
+
+2. 建立 DB
+
+    sudo docker run --rm --name db -e POSTGRES_USER=dja1 -e POSTGRES_PASSWORD='_MY_DB_PASSWORD_' -e POSTGRES_DB=my_focus_news -d -p 5432:5432 postgres:10.2-alpine
+
+3. 執行測試
+
+    cd /home/kyan/projects/my_focus_news/
+    source virtualenv/bin/activate
+    python manage.py test --failfast
+
+
+========================================================
+                Staging Server (手動測試)
+========================================================
+
+    cd /home/kyan/projects/my_focus_news/deployment/docker/
+    sudo docker-compose up
+    從瀏覽器查看:
+        http://192.168.0.28:8080
+
+
+========================================================
+                 測試 Staging Server (放棄)
+========================================================
+
+1. 按照官方教學來安裝 Docker:
+        https://docs.docker.com/install/linux/docker-ce/ubuntu/
+
+2. 安裝 docker-compose
+
+    virtualenv --python=python3 /root/venv
+    alias activate='source /root/venv/bin/activate'
+    activate
+    pip install docker-compose
+
+3. 啟動 docker-compose 服務
+
+    cd /home/kyan/projects/my_focus_news/deployment/docker/
+    docker-compose up
+
+4. 確認可用內建的 live server + 剛剛啟動的 db 通過測試
+
+    [切換到普通使用者: kyan]
+        cd /home/kyan/projects/my_focus_news/
+
+        source virtualenv/bin/activate
+        chmod 755 ./manage.py
+        ./manage.py test --failfast
+
+5. 使用 Staging Server 確認是否能通過測試
+
+    STAGING_SERVER=192.168.0.28:8080 ./manage.py test functional_tests --failfast
+
+    結論:
+        不行，情況還是一樣，即使我測試程式跟 staging server 用的是同一個 PostgreSQL ，還是不行
+
+        推測原因是因為，測試時 Django 會產生名字是 test_ 開頭的測試用資料庫，因此 Django 寫入資料時，用的是 test_my_focus_news，而 selenium 去連網頁時，看到的是 my_focus_news 資料庫的內容
+
+    解決方法:
+        1. 實作由介面透過 ModelForm 輸入資料的功能，這樣就不用在測試程式中用 Model.objects.create 來建立資料
+        2. 或是研究 Django 施展的魔法，讓 Django 在測試時能夠用 test_ 開頭的資料庫來顯示
+
+6. 放棄使用 Staging Server 測試
+
+
 
 ==================================================
       Ubuntu 上開發環境設定 (移植自 Windows)
@@ -37,7 +108,8 @@
     git clone https://github.com/gn01842919/my_focus_news.git
     cd my_focus_news
     virtualenv --python=python3 ./virtualenv
-
+    alias activate='source /home/kyan/projects/my_focus_news/virtualenv/bin/activate'
+    activate
 3. 安裝相依套件
 
     <方法一>
@@ -59,7 +131,7 @@
 
 5. 確認可以所有測試都能通過
 
-    virtualenv/bin/python manage.py test
+    virtualenv/bin/python manage.py test --failfast
 
 6. Git 設定
 
@@ -67,6 +139,23 @@
     git config --global user.name "gn01842919"
     git push -u origin master
     輸入帳號密碼時，要加上 @gmial.com
+
+7. 資料庫
+
+    sudo docker run --rm --name db -e POSTGRES_USER=dja1 -e POSTGRES_PASSWORD='_MY_DB_PASSWORD_' -e POSTGRES_DB=my_focus_news -d -p 5432:5432 postgres:10.2-alpine
+
+8. sudo vi /etc/hosts
+
+    修改第一行:
+        127.0.0.1       localhost
+    在 localhost 後面加上 db:
+        127.0.0.1       localhost db
+
+
+
+============================================================
+    後來資料庫改用 Docker，所以以下捨棄
+============================================================
 
 7. 安裝 PostgreSQL
 參考:

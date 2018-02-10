@@ -5,13 +5,10 @@ services:
     restart: always
     image: postgres:10.1-alpine
     container_name: db01
-    ports:
-      - "54321:5432"  # Should be removed when really deployed.
     environment:
       POSTGRES_USER: dja1
       POSTGRES_PASSWORD: _MY_DB_PASSWORD_
       POSTGRES_DB: my_focus_news
-
 
   nginx:
     restart: always
@@ -32,7 +29,7 @@ services:
     container_name: web01
     command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn my_focus_news.wsgi -b 0.0.0.0:8001"
     volumes:
-      - /root/my_focus_news:/src
+      - ../../../my_focus_news:/src
     expose:
       - "8001"
     depends_on:
