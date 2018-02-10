@@ -18,6 +18,8 @@ services:
       - "8080:80"
     volumes:
       - ./nginx/config:/etc/nginx/conf.d
+    volumes_from:
+      - web
     depends_on:
       - web
     links:
@@ -27,9 +29,10 @@ services:
     restart: always
     build: ./web
     container_name: web01
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn my_focus_news.wsgi -b 0.0.0.0:8001"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn my_focus_news.wsgi -b 0.0.0.0:8001"
     volumes:
       - ../../../my_focus_news:/src
+      - /static
     expose:
       - "8001"
     depends_on:

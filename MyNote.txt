@@ -44,11 +44,12 @@
                 Staging Server (手動測試)
 ========================================================
 
-    cd /home/kyan/projects/my_focus_news/deployment/docker/
-    sudo docker-compose up
-    從瀏覽器查看:
-        http://192.168.0.28:8080
+cd /home/kyan/projects/my_focus_news/deployment/docker/
+sudo docker-compose up
+從瀏覽器查看:
+    http://192.168.0.28:8080
 
+確認 CSS 是否正常
 
 ========================================================
                  測試 Staging Server (放棄)
@@ -60,8 +61,8 @@
 2. 安裝 docker-compose
 
     virtualenv --python=python3 /root/venv
-    alias activate='source /root/venv/bin/activate'
-    activate
+    echo "alias activate='source /root/venv/bin/activate'" >> ~/.bashrc
+    source /root/venv/bin/activate
     pip install docker-compose
 
 3. 啟動 docker-compose 服務
@@ -108,8 +109,8 @@
     git clone https://github.com/gn01842919/my_focus_news.git
     cd my_focus_news
     virtualenv --python=python3 ./virtualenv
-    alias activate='source /home/kyan/projects/my_focus_news/virtualenv/bin/activate'
-    activate
+    echo "alias activate='source /home/kyan/projects/my_focus_news/virtualenv/bin/activate'" >> ~/.bashrc
+    source /home/kyan/projects/my_focus_news/virtualenv/bin/activate
 3. 安裝相依套件
 
     <方法一>
