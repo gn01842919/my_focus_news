@@ -101,6 +101,12 @@ https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your
             }
         }
 
+    d. 其他
+        - 更改 dja1 的密碼
+            sudo -u postgres psql
+                ALTER USER dja1 WITH PASSWORD '_MY_DB_PASSWORD_';
+                \q
+
 8. sudo vi /etc/hosts
 
     修改第一行:
