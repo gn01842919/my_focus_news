@@ -25,7 +25,7 @@ SECRET_KEY = '9ik52wh&q0#(gpv($ef$2@f3x6g1)d_+vz9x%^9bw==oefzo=^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.0.26', 'localhost']
 
 
 # Application definition
@@ -79,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'my_focus_news',
         'USER': 'dja1',
-        'PASSWORD': 'aeSDd~ftR53F',
+        'PASSWORD': '_MY_DB_PASSWORD_',
         'HOST': 'db',
         'PORT': '',
     }

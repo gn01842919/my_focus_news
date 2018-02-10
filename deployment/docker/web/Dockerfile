@@ -25,8 +25,8 @@ COPY requirements.txt /
 RUN /venv/"${PROJECT_NAME}"/bin/pip install -r /requirements.txt && rm -f /requirements.txt
 
 # Source code will be put under /source
-VOLUME ["/source"]
-WORKDIR /source
+VOLUME ["/src"]
+WORKDIR /src
 
 # Setup entry point
 COPY entrypoint.sh /entrypoint.sh
@@ -36,7 +36,10 @@ ENTRYPOINT ["/entrypoint.sh"]
 # Other settings
 RUN echo "alias ll='ls -altr'" >> ~/.bashrc
 CMD ["/bin/bash"]
+# EXPOSE 8000
 
 # Use the following command to build and run:
 #       docker build -t proj-env:001 . && docker run -ti --name pyenv --rm proj-env:001
 
+# For test
+# RUN apt-get update && apt-get -y install lsof curl  && rm -rf /var/cache/apt && rm -rf /var/lib/apt/lists/*

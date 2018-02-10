@@ -1,0 +1,38 @@
+version: '2'
+
+services:
+  db:
+    restart: always
+    image: postgres:10.1-alpine
+    container_name: db
+    environment:
+      POSTGRES_USER: dja1
+      POSTGRES_PASSWORD: _MY_DB_PASSWORD_
+      POSTGRES_DB: my_focus_news
+
+  nginx:
+    restart: always
+    image: nginx:1.13.8-alpine
+    container_name: nginx01
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/config:/etc/nginx/conf.d
+    depends_on:
+      - web
+    links:
+      - web:web
+
+  web:
+    restart: always
+    build: ./web
+    container_name: web01
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn my_focus_news.wsgi -b 0.0.0.0:8001"
+    volumes:
+      - /root/my_focus_news:/src
+    expose:
+      - "8001"
+    depends_on:
+      - db
+    links:
+      - db:db
