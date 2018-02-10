@@ -24,6 +24,8 @@
     - DB 的密碼，實際上線時記得改掉
     - 如果 pip 要安裝的套件有變動，記得要:
         cp /root/my_focus_news/deployment/requirements.txt /root/my_focus_news/deployment/docker/web/requirements.txt
+    - 現在為了測試 FT，我開了DB的 5432 port，上線時要拿掉
+    - 測試 FT 的時候，Django 的測試端 (不是 Server，而是)的 settings.py 要改 DATABASES 裡面的 HOST
 
 2. 啟動
 

@@ -4,11 +4,14 @@ services:
   db:
     restart: always
     image: postgres:10.1-alpine
-    container_name: db
+    container_name: db01
+    ports:
+      - "54321:5432"  # Should be removed when really deployed.
     environment:
       POSTGRES_USER: dja1
       POSTGRES_PASSWORD: _MY_DB_PASSWORD_
       POSTGRES_DB: my_focus_news
+
 
   nginx:
     restart: always

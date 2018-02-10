@@ -15,6 +15,7 @@ ARG PROJECT_NAME=my_focus_news
 ENV PROJECT_NAME ${PROJECT_NAME}
 
 # Install Git and Vim
+# Can be removed if everything works perfectly~
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests git vim -y && rm -rf /var/cache/apt && rm -rf /var/lib/apt/lists/*
 
 # Set up Virtualenv
@@ -24,7 +25,7 @@ RUN pip install virtualenv && virtualenv --python=python3 /venv/"${PROJECT_NAME}
 COPY requirements.txt /
 RUN /venv/"${PROJECT_NAME}"/bin/pip install -r /requirements.txt && rm -f /requirements.txt
 
-# Source code will be put under /source
+# Source code will be put here
 VOLUME ["/src"]
 WORKDIR /src
 
@@ -36,10 +37,3 @@ ENTRYPOINT ["/entrypoint.sh"]
 # Other settings
 RUN echo "alias ll='ls -altr'" >> ~/.bashrc
 CMD ["/bin/bash"]
-# EXPOSE 8000
-
-# Use the following command to build and run:
-#       docker build -t proj-env:001 . && docker run -ti --name pyenv --rm proj-env:001
-
-# For test
-# RUN apt-get update && apt-get -y install lsof curl  && rm -rf /var/cache/apt && rm -rf /var/lib/apt/lists/*
