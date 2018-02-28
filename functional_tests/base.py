@@ -29,35 +29,12 @@ def wait(fn):
 
 class FunctionalTest(StaticLiveServerTestCase):
 
-    '''
-    The following methods are removed
-    because Django does not allow self-defined command-line arguments
-    in my version.
-
-    Output:
-        manage.py test: error: unrecognized arguments: --liveserver=192.168.0.26:8080
-
-    @classmethod
-    def setUpClass(cls):
-        for arg in sys.argv:
-            if 'liveserver' in arg:
-                cls.server_url = 'http://' + arg.split('=')[1]
-                return
-        super().setUpClass()
-        cls.server_url = cls.live_server_url
-
-    @classmethod
-    def tearDownClass(cls):
-        if cls.server_url == cls.live_server_url:
-            super().tearDownClass()
-    '''
-
     def setUp(self):
         self.browser = webdriver.Firefox()
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
             self.live_server_url = 'http://' + self.staging_server
-        print("[Server]: " + self.live_server_url)
+        # print("[Server]: " + self.live_server_url)
 
     def tearDown(self):
         if self._test_has_failed():
@@ -98,5 +75,4 @@ class FunctionalTest(StaticLiveServerTestCase):
         )
 
     def _test_has_failed(self):
-        # slightly obscure but couldn't find a better way!
         return any(error for (method, error) in self._outcome.errors)

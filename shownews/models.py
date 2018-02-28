@@ -38,12 +38,16 @@ class ScrapingRule(models.Model):
 
     @property
     def details(self):
-        output = "<Rule %d> " % (self.id)
-        output += "[Active] " if self.active else "[Inactive] "
-        output += "Include (" + ', '.join(k.name for k in self.keywords.all() if k.to_include)
-        output += "), Exclude (" + ', '.join(k.name for k in self.keywords.all() if not k.to_include)
-        output += "), Tags (" + ', '.join(t.name for t in self.tags.all()) + ')'
-        return output
+        return (
+            "<Rule {rule_id}> [{is_active}] Include ({kw_inc}), Exclude ({kw_exc}), Tags ({tags})"
+            .format(
+                rule_id=self.id,
+                is_active="Active" if self.active else "Inactive",
+                kw_inc=', '.join(k.name for k in self.keywords.all() if k.to_include),
+                kw_exc=', '.join(k.name for k in self.keywords.all() if not k.to_include),
+                tags=', '.join(t.name for t in self.tags.all())
+            )
+        )
 
     def __str__(self):
         return self.name + '  ' + self.details
