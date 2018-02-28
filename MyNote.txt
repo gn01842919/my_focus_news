@@ -40,6 +40,10 @@
     python manage.py test --failfast
 
 
+4. 登入 postgreSQL
+
+    psql -h localhost -p 5432 -U dja1 my_focus_news
+
 ========================================================
                 Staging Server (手動測試)
 ========================================================
@@ -152,7 +156,9 @@ sudo docker-compose up
     在 localhost 後面加上 db:
         127.0.0.1       localhost db
 
+9. 安裝 PostgreSQL client
 
+sudo apt install postgresql-client-common postgresql-client
 
 ============================================================
     後來資料庫改用 Docker，所以以下捨棄
