@@ -59,6 +59,7 @@ class ScrapingRule(models.Model):
 class NewsData(models.Model):
     title = models.TextField(default='')
     url = models.URLField(unique=True)
+    content = models.TextField(default='', blank=True)
     time = models.DateTimeField(default=timezone.now)
     read_time = models.DateTimeField(null=True, blank=True)
     creation_time = models.DateTimeField(auto_now_add=True)
@@ -71,3 +72,17 @@ class NewsData(models.Model):
 
     class Meta:
         ordering = ['-time', '-creation_time']
+
+
+class ScoreMap(models.Model):
+    # No UT for this class. I trust Django Model....
+    news = models.ForeignKey(NewsData)
+    rule = models.ForeignKey(ScrapingRule)
+    weight = models.DecimalField(default=0.0, max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return("['{}' : {}]  ==> {}".format(self.news.title, self.rule.name, self.weight))
+
+    class Meta:
+        ordering = ['-weight']
+        unique_together = ('news', 'rule')
