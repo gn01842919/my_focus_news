@@ -58,7 +58,7 @@ class ScrapingRule(models.Model):
 
 class NewsData(models.Model):
     title = models.TextField(default='')
-    url = models.URLField(unique=True)
+    url = models.URLField(unique=True, max_length=500)
     content = models.TextField(default='', blank=True)
     time = models.DateTimeField(default=timezone.now)
     read_time = models.DateTimeField(null=True, blank=True)
