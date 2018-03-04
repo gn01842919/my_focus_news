@@ -1,8 +1,47 @@
+from . import utils
 from .base import FunctionalTest
 from shownews.models import NewsData
 
 
 class NewsPageTest(FunctionalTest):
+
+    def test_news_are_sored_by_scores(self):
+
+        # Create data for testing
+        news_data = utils.create_news_data_for_test(5)
+        tags = utils.create_tags_for_test(4)
+        keywords = utils.create_keywords_for_test(4)
+        scraping_rules = [
+            utils.create_rule_for_test("rule1", tags=tags[:2], keywords=keywords[:2]),
+            utils.create_rule_for_test("rule2", tags=tags[2:4], keywords=keywords[2:4]),
+            utils.create_rule_for_test("rule3", tags=tags[1:3], keywords=keywords[1:3]),
+            utils.create_rule_for_test("rule4", tags=tags, keywords=keywords),
+        ]
+        utils.create_scoremap_for_test(news_data, scraping_rules[:2])
+
+        sorted_news = utils.get_news_sorted_by_scores_based_on_rules(
+            news_data, scraping_rules
+        )
+
+        titles_expected = [news.title for news in sorted_news]
+
+        # Go to /news/ and get news titles in the page
+        self.browser.get(self.live_server_url + '/news/')
+
+        news_table = self.wait_for(
+            lambda: self.browser.find_element_by_id('id_news_table')
+        )
+        rows = news_table.find_elements_by_tag_name('tr')
+
+        titles_found = []
+        for index, row in enumerate(rows):
+            td_title = row.find_element_by_css_selector('.news_title')
+            titles_found.append(td_title.find_element_by_css_selector('a').text)
+
+        # Make sure the sequence is as expected
+        self.assertEqual(titles_found, titles_expected)
+
+        # Done
 
     def test_can_view_all_the_news(self):
 
