@@ -1,6 +1,6 @@
-from . import utils
 from .base import FunctionalTest
 from shownews.models import NewsData
+from shownews.tests import utils
 
 
 class NewsPageTest(FunctionalTest):

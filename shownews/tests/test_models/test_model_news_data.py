@@ -8,7 +8,11 @@ from shownews.models import NewsData, ScrapingRule, NewsKeyword, NewsCategory
 
 
 def create_news_data_with_ordering():
-
+    """
+    expected_ordering:
+        1. sort by news.time (reverse)
+        2. sort by creation time (reverse)
+    """
     num = 10
     titles = ['title_%s' % i for i in range(num)]
     urls = ['http://%s.com' % title for title in titles]
