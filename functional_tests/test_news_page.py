@@ -8,8 +8,8 @@ class NewsPageTest(FunctionalTest):
 
         # Create data for testing
         news_data = [
-            NewsData.objects.create(title='Title 1', url='http://url1.com'),
-            NewsData.objects.create(title='Title 2', url='http://url2.com'),
+            NewsData.objects.create(title='Title 1', url='http://url1.com/'),
+            NewsData.objects.create(title='Title 2', url='http://url2.com/'),
         ]
 
         # Go to /news/all/
@@ -31,8 +31,9 @@ class NewsPageTest(FunctionalTest):
         expected_urls = [news.url for news in news_data]
 
         for index, row in enumerate(rows):
-            title = row.find_element_by_css_selector('.news_title').text
-            url = row.find_element_by_css_selector('.news_url').text
+            td_title = row.find_element_by_css_selector('.news_title')
+            title = td_title.find_element_by_css_selector('a').text
+            url = td_title.find_element_by_css_selector('a').get_attribute('href')
             date = row.find_element_by_css_selector('.news_date').text
             self.assertIn(title, expected_titles)
             self.assertIn(url, expected_urls)
@@ -44,8 +45,8 @@ class NewsPageTest(FunctionalTest):
 
         # There are already some news...
         news_data = [
-            NewsData.objects.create(title='Title 1', url='http://url1.com'),
-            NewsData.objects.create(title='Title 2', url='http://url2.com'),
+            NewsData.objects.create(title='Title 1', url='http://url1.com/'),
+            NewsData.objects.create(title='Title 2', url='http://url2.com/'),
         ]
 
         # Go to homepage
@@ -74,8 +75,9 @@ class NewsPageTest(FunctionalTest):
         expected_urls = [news.url for news in news_data]
 
         for row in rows:
-            title = row.find_element_by_css_selector('.news_title').text
-            url = row.find_element_by_css_selector('.news_url').text
+            td_title = row.find_element_by_css_selector('.news_title')
+            title = td_title.find_element_by_css_selector('a').text
+            url = td_title.find_element_by_css_selector('a').get_attribute('href')
             date = row.find_element_by_css_selector('.news_date').text
             self.assertIn(title, expected_titles)
             self.assertIn(url, expected_urls)
@@ -83,8 +85,8 @@ class NewsPageTest(FunctionalTest):
 
         # More news are generated
         more_news_data = [
-            NewsData.objects.create(title='Title 3', url='http://url3.com'),
-            NewsData.objects.create(title='Title 4', url='http://url4.com'),
+            NewsData.objects.create(title='Title 3', url='http://url3.com/'),
+            NewsData.objects.create(title='Title 4', url='http://url4.com/'),
         ]
 
         # refresh the page
@@ -102,8 +104,9 @@ class NewsPageTest(FunctionalTest):
         new_expected_urls = [news.url for news in more_news_data]
 
         for row in rows:
-            title = row.find_element_by_css_selector('.news_title').text
-            url = row.find_element_by_css_selector('.news_url').text
+            td_title = row.find_element_by_css_selector('.news_title')
+            title = td_title.find_element_by_css_selector('a').text
+            url = td_title.find_element_by_css_selector('a').get_attribute('href')
             date = row.find_element_by_css_selector('.news_date').text
             self.assertIn(title, new_expected_titles)
             self.assertNotIn(title, expected_titles)
