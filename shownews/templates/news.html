@@ -6,8 +6,9 @@
     <table id="id_news_table" class="table">
         {% for news in news_set %}
             <tr>
-                <td class='news_title'>{{ news.title }}</td>
-                <td class='news_url'>{{ news.url }}</td>
+                <td class='news_title'>
+                    <a href='{{ news.url }}'>{{ news.title }}</a>
+                </td>
                 <td class='news_date'>{{ news.time }}</td>
             </tr>
         {% endfor %}
