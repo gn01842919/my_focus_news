@@ -1,19 +1,22 @@
 from .base import FunctionalTest
-from shownews.models import ScrapingRule, NewsKeyword, NewsData
+from shownews.tests import utils
 
 
 class RulesPageTest(FunctionalTest):
 
     def test_can_view_rules(self):
-
         # Create data for testing
-        rule1 = ScrapingRule.objects.create(name='rule_name_1')
-        rule2 = ScrapingRule.objects.create(active=False, name='rule_name_2')
-        keyword1 = NewsKeyword.objects.create(name='keyword1')
-        keyword2 = NewsKeyword.objects.create(name='keyword2', to_include=False)
-        keyword3 = NewsKeyword.objects.create(name='keyword3')
-        rule1.keywords.add(keyword1, keyword2, keyword3)
-        rule2.keywords.add(keyword2, keyword3)
+        keywords = utils.create_keywords_for_test(3)
+        keywords.extend(utils.create_keywords_for_test(2, to_include=False))
+        utils.create_a_rule_for_test(
+            name='rule_1',
+            keywords=keywords[1:4]
+        )
+        utils.create_a_rule_for_test(
+            name='rule_2',
+            keywords=[keywords[0], keywords[4]],
+            is_active=False
+        )
 
         # Go to rules page
         self.browser.get(self.live_server_url + '/rules/')
@@ -25,33 +28,29 @@ class RulesPageTest(FunctionalTest):
         self.assertIn('Scraping Rules', header_text)
 
         # There is a table containing current rules
-        rules_table = self.wait_for(lambda: self.browser.find_element_by_id('id_rules_table'))
-
-        # import time
-        # time.sleep(10)
+        rules_table = self.wait_for(
+            lambda: self.browser.find_element_by_id('id_rules_table')
+        )
 
         rows = rules_table.find_elements_by_tag_name('tr')
 
         self.assertTrue(rows)
 
         for rule in rows:
-            self.assertIn('rule_name_', rule.text)
+            self.assertIn('rule_', rule.text)
 
         # Done
 
     def test_click_rule_will_show_related_news(self):
 
         # Create testing data
-        rule1 = ScrapingRule.objects.create(name='rule1')
-        rule2 = ScrapingRule.objects.create(name='rule2')
+        rules = utils.create_empty_rules_for_test(2)
+        news_data = utils.create_news_data_for_test(3)
 
-        news1 = NewsData.objects.create(title='News1', url='http://url1.com')
-        news2 = NewsData.objects.create(title='News2', url='http://url2.com')
-        news3 = NewsData.objects.create(title='News3', url='http://url3.com')
+        news_data[0].rules.add(rules[0], rules[1])
+        news_data[1].rules.add(rules[0])
+        news_data[2].rules.add(rules[1])
 
-        news1.rules.add(rule1, rule2)
-        news2.rules.add(rule1)
-        news3.rules.add(rule2)
         expected_url = self.live_server_url + '/news/rule/%d/'
 
         # Go to rules page
@@ -62,18 +61,18 @@ class RulesPageTest(FunctionalTest):
         )
 
         # Click the first rule's link
-        rules_table.find_element_by_link_text(rule1.name).click()
+        rules_table.find_element_by_link_text(rules[0].name).click()
 
         # Found the title is different
         self.wait_for(
             lambda: self.assertEqual(
                 self.browser.find_element_by_tag_name('h1').text,
-                rule1.name
+                rules[0].name
             )
         )
 
         # Found that url is redirected to /news/rule/1/
-        self.assertEqual(self.browser.current_url, expected_url % rule1.id)
+        self.assertEqual(self.browser.current_url, expected_url % rules[0].id)
 
         # Go back to the rules page
         self.browser.find_element_by_link_text('Scraping Rules').click()
@@ -86,17 +85,17 @@ class RulesPageTest(FunctionalTest):
         self.assertEqual(self.browser.current_url, self.live_server_url + '/rules/')
 
         # Click the second rule's link
-        rules_table.find_element_by_link_text(rule2.name).click()
+        rules_table.find_element_by_link_text(rules[1].name).click()
 
         # Found the title is different
         self.wait_for(
             lambda: self.assertEqual(
                 self.browser.find_element_by_tag_name('h1').text,
-                rule2.name
+                rules[1].name
             )
         )
 
         # Found that url is redirected to /news/rule/2/
-        self.assertEqual(self.browser.current_url, expected_url % rule2.id)
+        self.assertEqual(self.browser.current_url, expected_url % rules[1].id)
 
         # Done

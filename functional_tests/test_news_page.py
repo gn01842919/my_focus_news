@@ -5,19 +5,13 @@ from shownews.tests.test_views import _create_testing_scraping_rules_and_newsdat
 
 class NewsPageTest(FunctionalTest):
 
-    def test_news_are_sored_by_scores(self):
-
-        # Create data for testing, including ScoreMap
-        news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
-
-        sorted_news = utils.get_news_sorted_by_scores_based_on_rules(
-            news_data, scraping_rules
-        )
-
-        titles_expected = [news.title for news in sorted_news]
+    def _given_rules_test_only_related_news_are_displayed_in_order(
+        self, expected_news, target_url
+    ):
+        titles_expected = [news.title for news in expected_news]
 
         # Go to /news/ and get news titles in the page
-        self.browser.get(self.live_server_url + '/news/')
+        self.browser.get(target_url)
 
         news_table = self.wait_for(
             lambda: self.browser.find_element_by_id('id_news_table')
@@ -32,7 +26,47 @@ class NewsPageTest(FunctionalTest):
         # Make sure the sequence is as expected
         self.assertEqual(titles_found, titles_expected)
 
-        # Done
+    def test_news_are_sorted_by_scores(self):
+
+        # Create data for testing, including ScoreMap
+        news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
+
+        sorted_news = utils.get_news_sorted_by_scores_based_on_rules(
+            news_data, scraping_rules
+        )
+
+        self._given_rules_test_only_related_news_are_displayed_in_order(
+            sorted_news,
+            self.live_server_url + '/news/all/'
+        )
+        self._given_rules_test_only_related_news_are_displayed_in_order(
+            sorted_news,
+            self.live_server_url + '/news/'
+        )
+
+        # For news created by a specified ScrapingRule
+        taget_rule = scraping_rules[0]
+        related_news = taget_rule.newsdata_set.all()
+
+        sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
+            related_news, taget_rule
+        )
+        self._given_rules_test_only_related_news_are_displayed_in_order(
+            sorted_related_news,
+            self.live_server_url + '/news/rule/%s/' % taget_rule.id
+        )
+
+        # For news with a given tag
+        target_tag = taget_rule.tags.all()[0]
+        rules_having_target_tag = target_tag.scrapingrule_set.all()
+
+        sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
+            related_news, rules_having_target_tag
+        )
+        self._given_rules_test_only_related_news_are_displayed_in_order(
+            sorted_related_news,
+            self.live_server_url + '/news/category/%s/' % target_tag.id
+        )
 
     def test_can_view_all_the_news(self):
 
