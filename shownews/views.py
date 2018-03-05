@@ -4,9 +4,7 @@ from shownews.models import NewsData, ScrapingRule, NewsCategory
 from .tests import utils
 
 
-def _sort_news_data_by_all_rules(news_data):
-    scraping_rules = ScrapingRule.objects.all()
-
+def _sort_news_data_by_rules(news_data, scraping_rules):
     return utils.get_news_sorted_by_scores_based_on_rules(
         news_data, scraping_rules
     )
@@ -27,7 +25,8 @@ def unread_news(request):
         news.read_time = curr_time
         news.save()
 
-    sorted_unread_news_data = _sort_news_data_by_all_rules(unread_news)
+    all_rules = ScrapingRule.objects.all()
+    sorted_unread_news_data = _sort_news_data_by_rules(unread_news, all_rules)
 
     return render(request, 'news.html', {
         'news_set': sorted_unread_news_data,
@@ -36,7 +35,8 @@ def unread_news(request):
 
 
 def all_news(request):
-    sorted_news_data = _sort_news_data_by_all_rules(NewsData.objects.all())
+    all_rules = ScrapingRule.objects.all()
+    sorted_news_data = _sort_news_data_by_rules(NewsData.objects.all(), all_rules)
 
     return render(request, 'news.html', {
         'news_set': sorted_news_data,
@@ -61,22 +61,21 @@ def categories(request):
 def news_by_category(request, tag_id):
 
     tag = NewsCategory.objects.get(id=tag_id)
-    target_rules = set()
+    target_rules = set(tag.scrapingrule_set.all())
 
-    target_rules.update(tag.scrapingrule_set.all())
-
-    # print(target_rules)
-
-    news_set = []
+    related_news_data = []
 
     for news in NewsData.objects.all():
         for rule in news.rules.all():
             if rule in target_rules:
-                news_set.append(news)
-                break
+                score = utils.get_score_of_a_news_by_a_rule(news, rule)
+                if score > 0:
+                    related_news_data.append(news)
+
+    sorted_related_news_data = _sort_news_data_by_rules(related_news_data, target_rules)
 
     return render(request, 'news.html', {
-        'news_set': news_set,
+        'news_set': sorted_related_news_data,
         'page_title': tag.name + ' News',
     })
 
@@ -85,7 +84,16 @@ def news_by_rule(request, rule_id):
 
     rule = ScrapingRule.objects.get(id=rule_id)
 
+    news_score_map = {
+        news: utils.get_score_of_a_news_by_a_rule(news, rule)
+        for news in rule.newsdata_set.all()
+    }
+
+    related_news_data = (news for news, score in news_score_map.items() if score > 0)
+
+    sorted_related_news_data = _sort_news_data_by_rules(related_news_data, (rule,))
+
     return render(request, 'news.html', {
-        'news_set': rule.newsdata_set.all(),
+        'news_set': sorted_related_news_data,
         'page_title': rule.name,
     })

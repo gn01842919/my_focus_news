@@ -60,8 +60,12 @@ class NewsPageTest(FunctionalTest):
         target_tag = taget_rule.tags.all()[0]
         rules_having_target_tag = target_tag.scrapingrule_set.all()
 
+        related_news = []
+        for rule in rules_having_target_tag:
+            related_news.extend(rule.newsdata_set.all())
+
         sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
-            related_news, rules_having_target_tag
+            set(related_news), rules_having_target_tag
         )
         self._given_rules_test_only_related_news_are_displayed_in_order(
             sorted_related_news,

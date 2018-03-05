@@ -88,6 +88,8 @@ class AllNewsPageTest(TestCase):
 
 
 class UnreadNewsTest(AllNewsPageTest):
+    """Note that this inherits from AllNewsPageTest !!!!!
+    """
 
     def setUp(self):
         self.target_url = reverse('unread_news')
@@ -131,16 +133,49 @@ class SpecifiedNewsTest(TestCase):
         response = self.client.get(rule.get_absolute_url())
         self.assertTemplateUsed(response, 'news.html')
 
-    def test_display_news_for_given_category_id(self):
+    def test_news_with_given_rule_are_sorted_by_scores(self):
+        news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
+        target_rule = scraping_rules[0]
+        related_news = target_rule.newsdata_set.all()
 
-        # Setup rules
+        sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
+            related_news, (target_rule,)
+        )
+
+        response = self.client.get(target_rule.get_absolute_url())
+        responsed_news = list(response.context['news_set'])
+
+        self.assertEqual(len(responsed_news), len(sorted_related_news))
+        self.assertEqual(responsed_news, sorted_related_news)
+
+    def test_news_with_given_tag_are_sorted_by_scores(self):
+
+        news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
+        target_tag = scraping_rules[0].tags.all()[0]
+        rules_having_target_tag = target_tag.scrapingrule_set.all()
+
+        related_news = []
+        for rule in rules_having_target_tag:
+            related_news.extend(rule.newsdata_set.all())
+
+        sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
+            set(related_news), rules_having_target_tag
+        )
+
+        response = self.client.get(target_tag.get_absolute_url())
+        responsed_news = list(response.context['news_set'])
+
+        self.assertEqual(len(responsed_news), len(sorted_related_news))
+        self.assertEqual(responsed_news, sorted_related_news)
+
+    def test_displays_news_for_given_category_id(self):
+
+        # Setup news_data and rules
         tags = utils.create_tags_for_test(3)
         rules = [
             utils.create_a_rule_for_test("rule_1", tags=tags[:2]),
             utils.create_a_rule_for_test("rule_2", tags=[tags[0], tags[2]])
         ]
-
-        # Setup news data
         news_data = utils.create_news_data_for_test(2)
         news_data[0].rules.add(rules[0])
         news_data[1].rules.add(rules[1])
@@ -175,7 +210,7 @@ class SpecifiedNewsTest(TestCase):
         self.assertNotContains(response, news_data[0].title)
         self.assertContains(response, news_data[1].title)
 
-    def test_display_news_for_given_rule_id(self):
+    def test_displays_news_for_given_rule_id(self):
         rules = utils.create_empty_rules_for_test(3)
         news_data = utils.create_news_data_for_test(2)
         news_data[0].rules.add(rules[0], rules[2])
