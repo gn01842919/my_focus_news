@@ -54,21 +54,6 @@ class AllNewsPageTest(TestCase):
             self.assertIsInstance(response.context['news_set'][i], NewsData)
             self.assertContains(response, news.title)
 
-    def test_ordering(self):
-        """
-        news should be ordered reversely by:
-            1. publish time
-            2. creation time
-        if no scores is provided.
-        """
-        news_data, expected_ordering = create_news_data_with_ordering()
-
-        response = self.client.get(self.target_url)
-        responsed_news = list(response.context['news_set'])
-
-        self.assertEqual(len(responsed_news), len(expected_ordering))
-        self.assertEqual(responsed_news, expected_ordering)
-
     def test_news_are_ordered_by_score(self):
         news_data = utils.create_news_data_for_test(10)
         tags = utils.create_tags_for_test(10)
@@ -144,17 +129,27 @@ class UnreadNewsTest(TestCase):
         self.assertIsNotNone(saved_news[0].read_time)
         self.assertIsNotNone(saved_news[1].read_time)
 
-    def test_ordering(self):
+    def test_news_are_ordered_by_score(self):
+        news_data = utils.create_news_data_for_test(10)
+        tags = utils.create_tags_for_test(10)
+        keywords = utils.create_keywords_for_test(10)
+        scraping_rules = [
+            utils.create_rule_for_test("rule1", tags=tags[:5], keywords=keywords[:5]),
+            utils.create_rule_for_test("rule2", tags=tags[5:10], keywords=keywords[5:10]),
+            utils.create_rule_for_test("rule3", tags=tags[2:6], keywords=keywords[2:6]),
+            utils.create_rule_for_test("rule4", tags=tags, keywords=keywords),
+        ]
+        utils.create_scoremap_for_test(news_data, scraping_rules[:7])
 
-        news_data, expected_ordering = create_news_data_with_ordering()
+        sorted_news = utils.get_news_sorted_by_scores_based_on_rules(
+            news_data, scraping_rules
+        )
 
         response = self.client.get(self.target_url)
-        responsed_news = response.context['news_set']
+        responsed_news = list(response.context['news_set'])
 
-        expected_ordering = [news for news in expected_ordering if not news.read_time]
-
-        self.assertEqual(len(responsed_news), len(expected_ordering))
-        self.assertEqual(list(responsed_news), expected_ordering)
+        self.assertEqual(len(responsed_news), len(sorted_news))
+        self.assertEqual(responsed_news, sorted_news)
 
 
 class SpecifiedNewsTest(TestCase):

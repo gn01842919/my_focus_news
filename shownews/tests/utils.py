@@ -5,22 +5,17 @@ from shownews import models
 def get_news_sorted_by_scores_based_on_rules(news_data, scraping_rules):
 
     news_score_map = {}
-    score_list = []
+    # score_list = []
 
     for news in news_data:
         total_score = 0
         for rule in scraping_rules:
             score = _get_score_of_a_news_by_rule(news, rule)
-            score_list.append(str(score))
+            # score_list.append(str(score))
             if score > 0:
                 total_score += score
 
         news_score_map[news] = total_score
-
-    print('@@@@@@@@@@@@@')
-    print(score_list)
-    print(news_score_map)
-    print('@@@@@@@@@@@@@')
 
     return sorted(news_score_map, key=news_score_map.get, reverse=True)
 

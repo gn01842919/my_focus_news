@@ -1,6 +1,15 @@
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from shownews.models import NewsData, ScrapingRule, NewsCategory
+from .tests import utils
+
+
+def _sort_news_data_by_all_rules(news_data):
+    scraping_rules = ScrapingRule.objects.all()
+
+    return utils.get_news_sorted_by_scores_based_on_rules(
+        news_data, scraping_rules
+    )
 
 
 # Create your views here.
@@ -18,15 +27,19 @@ def unread_news(request):
         news.read_time = curr_time
         news.save()
 
+    sorted_unread_news_data = _sort_news_data_by_all_rules(unread_news)
+
     return render(request, 'news.html', {
-        'news_set': unread_news,
+        'news_set': sorted_unread_news_data,
         'page_title': 'Unread Focus News',
     })
 
 
 def all_news(request):
+    sorted_news_data = _sort_news_data_by_all_rules(NewsData.objects.all())
+
     return render(request, 'news.html', {
-        'news_set': NewsData.objects.all(),
+        'news_set': sorted_news_data,
         'page_title': 'All News',
     })
 
