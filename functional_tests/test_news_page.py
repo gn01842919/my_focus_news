@@ -1,23 +1,14 @@
 from .base import FunctionalTest
-from shownews.models import NewsData
 from shownews.tests import utils
+from shownews.tests.test_views import _create_testing_scraping_rules_and_newsdata
 
 
 class NewsPageTest(FunctionalTest):
 
     def test_news_are_sored_by_scores(self):
 
-        # Create data for testing
-        news_data = utils.create_news_data_for_test(5)
-        tags = utils.create_tags_for_test(4)
-        keywords = utils.create_keywords_for_test(4)
-        scraping_rules = [
-            utils.create_rule_for_test("rule1", tags=tags[:2], keywords=keywords[:2]),
-            utils.create_rule_for_test("rule2", tags=tags[2:4], keywords=keywords[2:4]),
-            utils.create_rule_for_test("rule3", tags=tags[1:3], keywords=keywords[1:3]),
-            utils.create_rule_for_test("rule4", tags=tags, keywords=keywords),
-        ]
-        utils.create_scoremap_for_test(news_data, scraping_rules[:2])
+        # Create data for testing, including ScoreMap
+        news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
 
         sorted_news = utils.get_news_sorted_by_scores_based_on_rules(
             news_data, scraping_rules
@@ -46,10 +37,7 @@ class NewsPageTest(FunctionalTest):
     def test_can_view_all_the_news(self):
 
         # Create data for testing
-        news_data = [
-            NewsData.objects.create(title='Title 1', url='http://url1.com/'),
-            NewsData.objects.create(title='Title 2', url='http://url2.com/'),
-        ]
+        news_data = utils.create_news_data_for_test(2)
 
         # Go to /news/all/
         self.browser.get(self.live_server_url + '/news/all/')
@@ -83,10 +71,7 @@ class NewsPageTest(FunctionalTest):
     def test_only_display_unread_news_by_default(self):
 
         # There are already some news...
-        news_data = [
-            NewsData.objects.create(title='Title 1', url='http://url1.com/'),
-            NewsData.objects.create(title='Title 2', url='http://url2.com/'),
-        ]
+        news_data = utils.create_news_data_for_test(2)
 
         # Go to homepage
         self.browser.get(self.live_server_url)
@@ -123,10 +108,7 @@ class NewsPageTest(FunctionalTest):
             self.assertTrue(date)
 
         # More news are generated
-        more_news_data = [
-            NewsData.objects.create(title='Title 3', url='http://url3.com/'),
-            NewsData.objects.create(title='Title 4', url='http://url4.com/'),
-        ]
+        more_news_data = utils.create_news_data_for_test(2, start_index=3)
 
         # refresh the page
         self.browser.refresh()

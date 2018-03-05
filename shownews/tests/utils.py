@@ -27,17 +27,24 @@ def create_scoremap_for_test(news_data, scraping_rules):
             models.ScoreMap.objects.create(news=news, rule=rule, weight=score)
 
 
-def create_news_data_for_test(num, title_prefix="news_", url_prifix="http://ttt.com/"):
+def create_news_data_for_test(num, start_index=1, title_prefix="news_", url_prifix="http://test.url/"):
     return [
         models.NewsData.objects.create(
             title=title_prefix + str(i),
             url=url_prifix + str(i) + '/'
         )
-        for i in range(num)
+        for i in range(start_index, num + start_index)
     ]
 
 
-def create_rule_for_test(name, tags=None, keywords=None, is_active=True):
+def create_empty_rules_for_test(num, prefix="rule_"):
+    return [
+        create_a_rule_for_test(name=prefix + str(i))
+        for i in range(1, num + 1)
+    ]
+
+
+def create_a_rule_for_test(name, tags=None, keywords=None, is_active=True):
     rule = models.ScrapingRule.objects.create(name=name, active=is_active)
 
     if keywords:
@@ -54,14 +61,14 @@ def create_rule_for_test(name, tags=None, keywords=None, is_active=True):
 def create_tags_for_test(num, prefix="tag_"):
     return [
         models.NewsCategory.objects.create(name=prefix + str(i))
-        for i in range(num)
+        for i in range(1, num + 1)
     ]
 
 
 def create_keywords_for_test(num, prefix="keywords_", to_include=True):
     return [
         models.NewsKeyword.objects.create(name=prefix + str(i), to_include=to_include)
-        for i in range(num)
+        for i in range(1, num + 1)
     ]
 
 
