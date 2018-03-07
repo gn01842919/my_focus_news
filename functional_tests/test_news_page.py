@@ -1,6 +1,21 @@
 from .base import FunctionalTest
-from shownews.tests import utils
-from shownews.tests.test_views import _create_testing_scraping_rules_and_newsdata
+from shownews import common_utils
+
+
+def _create_testing_scraping_rules_and_newsdata():
+    news_data = common_utils.create_news_data_for_test(10)
+    tags = common_utils.create_tags_for_test(10)
+    keywords = common_utils.create_keywords_for_test(10)
+    scraping_rules = [
+        common_utils.create_a_rule_for_test("rule1", tags=tags[:5], keywords=keywords[:5]),
+        common_utils.create_a_rule_for_test("rule2", tags=tags[5:10], keywords=keywords[5:10]),
+        common_utils.create_a_rule_for_test("rule3", tags=tags[2:6], keywords=keywords[2:6]),
+        common_utils.create_a_rule_for_test("rule4", tags=tags, keywords=keywords),
+    ]
+    common_utils.create_scoremap_for_test(
+        news_data, scraping_rules[:3], allow_nonpositive_score=True
+    )
+    return news_data, scraping_rules
 
 
 class NewsPageTest(FunctionalTest):
@@ -31,25 +46,24 @@ class NewsPageTest(FunctionalTest):
         # Create data for testing, including ScoreMap
         news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
 
-        sorted_news = utils.get_news_sorted_by_scores_based_on_rules(
+        sorted_news = common_utils.sort_news_by_scores_of_rules(
             news_data, scraping_rules
-        )
-
-        self._given_rules_test_only_related_news_are_displayed_in_order(
-            sorted_news,
-            self.live_server_url + '/news/all/'
         )
         self._given_rules_test_only_related_news_are_displayed_in_order(
             sorted_news,
             self.live_server_url + '/news/'
+        )
+        self._given_rules_test_only_related_news_are_displayed_in_order(
+            sorted_news,
+            self.live_server_url + '/news/all/'
         )
 
         # For news created by a specified ScrapingRule
         taget_rule = scraping_rules[0]
         related_news = taget_rule.newsdata_set.all()
 
-        sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
-            related_news, taget_rule
+        sorted_related_news = common_utils.sort_news_by_scores_of_rules(
+            related_news, (taget_rule,), positive_only=True
         )
         self._given_rules_test_only_related_news_are_displayed_in_order(
             sorted_related_news,
@@ -64,8 +78,8 @@ class NewsPageTest(FunctionalTest):
         for rule in rules_having_target_tag:
             related_news.extend(rule.newsdata_set.all())
 
-        sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
-            set(related_news), rules_having_target_tag
+        sorted_related_news = common_utils.sort_news_by_scores_of_rules(
+            set(related_news), rules_having_target_tag, positive_only=True
         )
         self._given_rules_test_only_related_news_are_displayed_in_order(
             sorted_related_news,
@@ -75,7 +89,7 @@ class NewsPageTest(FunctionalTest):
     def test_can_view_all_the_news(self):
 
         # Create data for testing
-        news_data = utils.create_news_data_for_test(2)
+        news_data = common_utils.create_news_data_for_test(2)
 
         # Go to /news/all/
         self.browser.get(self.live_server_url + '/news/all/')
@@ -109,7 +123,7 @@ class NewsPageTest(FunctionalTest):
     def test_only_display_unread_news_by_default(self):
 
         # There are already some news...
-        news_data = utils.create_news_data_for_test(2)
+        news_data = common_utils.create_news_data_for_test(2)
 
         # Go to homepage
         self.browser.get(self.live_server_url)
@@ -146,7 +160,7 @@ class NewsPageTest(FunctionalTest):
             self.assertTrue(date)
 
         # More news are generated
-        more_news_data = utils.create_news_data_for_test(2, start_index=3)
+        more_news_data = common_utils.create_news_data_for_test(2, start_index=3)
 
         # refresh the page
         self.browser.refresh()

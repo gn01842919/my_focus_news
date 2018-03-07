@@ -4,25 +4,27 @@ from django.utils import timezone
 from datetime import datetime
 import pytz
 from shownews.models import NewsData, ScrapingRule, NewsCategory
-from shownews.tests import utils
+from shownews import common_utils
 
 
 def _create_testing_scraping_rules_and_newsdata():
-    news_data = utils.create_news_data_for_test(10)
-    tags = utils.create_tags_for_test(10)
-    keywords = utils.create_keywords_for_test(10)
+    news_data = common_utils.create_news_data_for_test(10)
+    tags = common_utils.create_tags_for_test(10)
+    keywords = common_utils.create_keywords_for_test(10)
     scraping_rules = [
-        utils.create_a_rule_for_test("rule1", tags=tags[:5], keywords=keywords[:5]),
-        utils.create_a_rule_for_test("rule2", tags=tags[5:10], keywords=keywords[5:10]),
-        utils.create_a_rule_for_test("rule3", tags=tags[2:6], keywords=keywords[2:6]),
-        utils.create_a_rule_for_test("rule4", tags=tags, keywords=keywords),
+        common_utils.create_a_rule_for_test("rule1", tags=tags[:5], keywords=keywords[:5]),
+        common_utils.create_a_rule_for_test("rule2", tags=tags[5:10], keywords=keywords[5:10]),
+        common_utils.create_a_rule_for_test("rule3", tags=tags[2:6], keywords=keywords[2:6]),
+        common_utils.create_a_rule_for_test("rule4", tags=tags, keywords=keywords),
     ]
-    utils.create_scoremap_for_test(news_data, scraping_rules[:3])
+    common_utils.create_scoremap_for_test(
+        news_data, scraping_rules[:3], allow_nonpositive_score=True
+    )
     return news_data, scraping_rules
 
 
 def _create_testing_newsdata():
-    news_data = utils.create_news_data_for_test(4)
+    news_data = common_utils.create_news_data_for_test(4)
     news_data.extend([
         NewsData.objects.create(
             title='news_5',
@@ -76,7 +78,7 @@ class AllNewsPageTest(TestCase):
     def test_news_are_ordered_by_score(self):
         news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
 
-        sorted_news = utils.get_news_sorted_by_scores_based_on_rules(
+        sorted_news = common_utils.sort_news_by_scores_of_rules(
             news_data, scraping_rules
         )
 
@@ -109,7 +111,7 @@ class UnreadNewsTest(AllNewsPageTest):
             self.assertNotContains(response, news_data[i].title)
 
     def test_news_data_are_marked_as_read_once_shown_on_the_page(self):
-        for news in utils.create_news_data_for_test(5):
+        for news in common_utils.create_news_data_for_test(5):
             self.assertIsNone(news.read_time)
 
         # visit the page
@@ -124,61 +126,50 @@ class SpecifiedNewsTest(TestCase):
 
     def test_template_used(self):
         # For NewsCategory
-        tag = utils.create_tags_for_test(1)[0]
+        tag = common_utils.create_tags_for_test(1)[0]
         response = self.client.get(tag.get_absolute_url())
         self.assertTemplateUsed(response, 'news.html')
 
         # For ScrapingRule
-        rule = utils.create_empty_rules_for_test(1)[0]
+        rule = common_utils.create_empty_rules_for_test(1)[0]
         response = self.client.get(rule.get_absolute_url())
         self.assertTemplateUsed(response, 'news.html')
 
     def test_news_with_given_rule_are_sorted_by_scores(self):
         news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
         target_rule = scraping_rules[0]
-        related_news = target_rule.newsdata_set.all()
-
-        sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
-            related_news, (target_rule,)
-        )
+        expected_news = target_rule.get_sorted_related_news()
 
         response = self.client.get(target_rule.get_absolute_url())
         responsed_news = list(response.context['news_set'])
 
-        self.assertEqual(len(responsed_news), len(sorted_related_news))
-        self.assertEqual(responsed_news, sorted_related_news)
+        self.assertEqual(len(responsed_news), len(expected_news))
+        self.assertEqual(responsed_news, expected_news)
 
     def test_news_with_given_tag_are_sorted_by_scores(self):
 
         news_data, scraping_rules = _create_testing_scraping_rules_and_newsdata()
         target_tag = scraping_rules[0].tags.all()[0]
-        rules_having_target_tag = target_tag.scrapingrule_set.all()
 
-        related_news = []
-        for rule in rules_having_target_tag:
-            related_news.extend(rule.newsdata_set.all())
-
-        sorted_related_news = utils.get_news_sorted_by_scores_based_on_rules(
-            set(related_news), rules_having_target_tag
-        )
+        expected_news = target_tag.get_sorted_related_news()
 
         response = self.client.get(target_tag.get_absolute_url())
         responsed_news = list(response.context['news_set'])
 
-        self.assertEqual(len(responsed_news), len(sorted_related_news))
-        self.assertEqual(responsed_news, sorted_related_news)
+        self.assertEqual(len(responsed_news), len(expected_news))
+        self.assertEqual(responsed_news, expected_news)
 
     def test_displays_news_for_given_category_id(self):
 
         # Setup news_data and rules
-        tags = utils.create_tags_for_test(3)
+        tags = common_utils.create_tags_for_test(3)
         rules = [
-            utils.create_a_rule_for_test("rule_1", tags=tags[:2]),
-            utils.create_a_rule_for_test("rule_2", tags=[tags[0], tags[2]])
+            common_utils.create_a_rule_for_test("rule_1", tags=tags[:2]),
+            common_utils.create_a_rule_for_test("rule_2", tags=[tags[0], tags[2]])
         ]
-        news_data = utils.create_news_data_for_test(2)
-        news_data[0].rules.add(rules[0])
-        news_data[1].rules.add(rules[1])
+        news_data = common_utils.create_news_data_for_test(2)
+        common_utils.set_scoremap(news_data[0], rules[0])
+        common_utils.set_scoremap(news_data[1], rules[1])
 
         tag_responses = [self.client.get(tag.get_absolute_url()) for tag in tags]
 
@@ -211,10 +202,12 @@ class SpecifiedNewsTest(TestCase):
         self.assertContains(response, news_data[1].title)
 
     def test_displays_news_for_given_rule_id(self):
-        rules = utils.create_empty_rules_for_test(3)
-        news_data = utils.create_news_data_for_test(2)
-        news_data[0].rules.add(rules[0], rules[2])
-        news_data[1].rules.add(rules[1], rules[2])
+        rules = common_utils.create_empty_rules_for_test(3)
+        news_data = common_utils.create_news_data_for_test(2)
+        common_utils.set_scoremap(news_data[0], rules[0])
+        common_utils.set_scoremap(news_data[0], rules[2])
+        common_utils.set_scoremap(news_data[1], rules[1])
+        common_utils.set_scoremap(news_data[1], rules[2])
 
         rule_responses = [self.client.get(rule.get_absolute_url()) for rule in rules]
 
@@ -252,18 +245,18 @@ class RulesPageTest(TestCase):
         self.assertTemplateUsed(response, 'rules.html')
 
     def test_displays_rules(self):
-        keywords = utils.create_keywords_for_test(3)
-        keywords.extend(utils.create_keywords_for_test(2, to_include=False))
+        keywords = common_utils.create_keywords_for_test(3)
+        keywords.extend(common_utils.create_keywords_for_test(2, to_include=False))
 
-        tags = utils.create_tags_for_test(5)
+        tags = common_utils.create_tags_for_test(5)
 
         rules = [
-            utils.create_a_rule_for_test(
+            common_utils.create_a_rule_for_test(
                 name='rule_1',
                 keywords=keywords[1:4],
                 tags=tags[:3]
             ),
-            utils.create_a_rule_for_test(
+            common_utils.create_a_rule_for_test(
                 name='rule_2',
                 keywords=[keywords[0], keywords[4]],
                 tags=tags[3:],
@@ -296,7 +289,7 @@ class CategoriesPageTest(TestCase):
         self.assertTemplateUsed(response, 'categories.html')
 
     def test_display_rules(self):
-        tags = utils.create_tags_for_test(5)
+        tags = common_utils.create_tags_for_test(5)
 
         response = self.client.get(self.target_url)
 

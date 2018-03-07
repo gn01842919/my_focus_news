@@ -2,7 +2,7 @@ import random
 from shownews import models
 
 
-def get_news_sorted_by_scores_based_on_rules(news_data, scraping_rules):
+def sort_news_by_scores_of_rules(news_data, scraping_rules, positive_only=False):
 
     news_score_map = {}
 
@@ -13,7 +13,10 @@ def get_news_sorted_by_scores_based_on_rules(news_data, scraping_rules):
             if score > 0:
                 total_score += score
 
-        news_score_map[news] = total_score
+        if positive_only and total_score <= 0:
+            continue
+        else:
+            news_score_map[news] = total_score
 
     return sorted(news_score_map, key=news_score_map.get, reverse=True)
 
@@ -27,11 +30,20 @@ def get_score_of_a_news_by_a_rule(news, rule):
     return score_map.weight
 
 
-def create_scoremap_for_test(news_data, scraping_rules):
+def create_scoremap_for_test(news_data, scraping_rules, allow_nonpositive_score=False):
     for news in news_data:
         for rule in scraping_rules:
-            score = random.randint(-100, 100)
-            models.ScoreMap.objects.create(news=news, rule=rule, weight=score)
+            set_scoremap(news, rule, allow_nonpositive_score)
+
+
+def set_scoremap(news, rule, allow_nonpositive_score=False):
+    if allow_nonpositive_score:
+        min_score = -100
+    else:
+        min_score = 1
+    news.rules.add(rule)
+    score = random.randint(min_score, 100)
+    models.ScoreMap.objects.create(news=news, rule=rule, weight=score)
 
 
 def create_news_data_for_test(num, start_index=1, title_prefix="news_", url_prifix="http://test.url/"):

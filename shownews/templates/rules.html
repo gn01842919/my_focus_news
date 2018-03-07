@@ -8,6 +8,7 @@
             <tr class="scraping_rule">
                 <td><a href="{% url 'news_by_rule' rule.id %}">{{ rule.name }}</a></td>
                 <td>{{ rule.details }}</td>
+                <td>{{ rule.num_of_related_news }}</td>
             </tr>
         {% endfor %}
     </table>

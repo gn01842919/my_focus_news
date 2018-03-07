@@ -1,5 +1,6 @@
 from django.test import TestCase
 from shownews.models import ScrapingRule, NewsKeyword, NewsCategory, NewsData
+from shownews import common_utils
 
 
 class ScrapingRuleBasicTest(TestCase):
@@ -80,3 +81,21 @@ class ScrapingRuleBasicTest(TestCase):
         rule = ScrapingRule.objects.create()
         news.rules.add(rule)
         self.assertEqual(rule.get_absolute_url(), '/news/rule/%d/' % rule.id)
+
+    def test_get_sorted_related_news(self):
+
+        news_data = common_utils.create_news_data_for_test(5)
+        scraping_rules = common_utils.create_empty_rules_for_test(4)
+        common_utils.create_scoremap_for_test(news_data, scraping_rules[:3])
+
+        sorted_related_news_lists = {
+            rule: rule.get_sorted_related_news()
+            for rule in scraping_rules
+        }
+
+        for rule, news_list in sorted_related_news_lists.items():
+            expected_sorted_news = common_utils.sort_news_by_scores_of_rules(
+                news_data, (rule,), positive_only=True
+            )
+            self.assertEqual(len(expected_sorted_news), len(news_list))
+            self.assertEqual(set(expected_sorted_news), set(news_list))

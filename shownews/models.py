@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.core.urlresolvers import reverse
+from . import common_utils
 
 
 class NewsCategory(models.Model):
@@ -13,6 +14,23 @@ class NewsCategory(models.Model):
 
     def get_absolute_url(self):
         return reverse('news_by_category', args=[self.id])
+
+    @property
+    def num_of_related_news(self):
+        return len(self.get_sorted_related_news())
+
+    def get_sorted_related_news(self):
+
+        target_rules = set(self.scrapingrule_set.all())
+
+        related_news_data = set()
+
+        for rule in target_rules:
+            related_news_data.update(set(rule.get_sorted_related_news()))
+
+        return common_utils.sort_news_by_scores_of_rules(
+            related_news_data, target_rules
+        )
 
 
 class NewsKeyword(models.Model):
@@ -54,6 +72,20 @@ class ScrapingRule(models.Model):
 
     def get_absolute_url(self):
         return reverse('news_by_rule', args=[self.id])
+
+    @property
+    def num_of_related_news(self):
+        return len(self.get_sorted_related_news())
+
+    def get_sorted_related_news(self):
+
+        related_news_data = [
+            score_map.news for score_map in ScoreMap.objects.filter(rule=self)
+            if score_map.weight > 0
+        ]
+        return common_utils.sort_news_by_scores_of_rules(
+            related_news_data, (self,)
+        )
 
 
 class NewsData(models.Model):

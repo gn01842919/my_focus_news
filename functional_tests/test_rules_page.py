@@ -1,18 +1,18 @@
 from .base import FunctionalTest
-from shownews.tests import utils
+from shownews import common_utils
 
 
 class RulesPageTest(FunctionalTest):
 
     def test_can_view_rules(self):
         # Create data for testing
-        keywords = utils.create_keywords_for_test(3)
-        keywords.extend(utils.create_keywords_for_test(2, to_include=False))
-        utils.create_a_rule_for_test(
+        keywords = common_utils.create_keywords_for_test(3)
+        keywords.extend(common_utils.create_keywords_for_test(2, to_include=False))
+        common_utils.create_a_rule_for_test(
             name='rule_1',
             keywords=keywords[1:4]
         )
-        utils.create_a_rule_for_test(
+        common_utils.create_a_rule_for_test(
             name='rule_2',
             keywords=[keywords[0], keywords[4]],
             is_active=False
@@ -44,12 +44,16 @@ class RulesPageTest(FunctionalTest):
     def test_click_rule_will_show_related_news(self):
 
         # Create testing data
-        rules = utils.create_empty_rules_for_test(2)
-        news_data = utils.create_news_data_for_test(3)
+        rules = common_utils.create_empty_rules_for_test(2)
+        news_data = common_utils.create_news_data_for_test(3)
 
-        news_data[0].rules.add(rules[0], rules[1])
-        news_data[1].rules.add(rules[0])
-        news_data[2].rules.add(rules[1])
+        common_utils.set_scoremap(news_data[0], rules[0])
+        common_utils.set_scoremap(news_data[0], rules[1])
+        common_utils.set_scoremap(news_data[1], rules[0])
+        common_utils.set_scoremap(news_data[2], rules[1])
+        # news_data[0].rules.add(rules[0], rules[1])
+        # news_data[1].rules.add(rules[0])
+        # news_data[2].rules.add(rules[1])
 
         expected_url = self.live_server_url + '/news/rule/%d/'
 
