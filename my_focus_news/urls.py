@@ -14,8 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
-from django.contrib import admin
 from shownews.views import *
+# from django.contrib import admin
 
 news_patterns = [
     url(r'^$', unread_news, name='unread_news'),
@@ -25,7 +25,7 @@ news_patterns = [
 ]
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    # url(r'^admin/', admin.site.urls),
     url(r'^$', homepage, name='home'),
     url(r'^news/', include(news_patterns)),
     url(r'^rules/$', rules, name='rules'),
