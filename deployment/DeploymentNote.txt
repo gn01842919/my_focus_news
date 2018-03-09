@@ -22,21 +22,22 @@
     1) 從 Github 把程式碼抓到正確位置
 
     2) 修改一些設定:
-        - settings.py 把 HOST IP (目前是 '192.168.0.28' ) 加入 ALLOWED_HOSTS
+        - settings.py 把 HOST IP (目前是 '192.168.0.19' ) 加入 ALLOWED_HOSTS
         - DEBUG 設為 False
         - DB 的密碼，實際上線時記得改掉
         - 更新 requirements.txt :
-            cp /root/my_focus_news/deployment/requirements.txt /root/my_focus_news/deployment/docker/web/requirements.txt
-        - docker-compose.yml 的 volume 對應設定要改:
-                volumes:
-                    - /home/kyan/projects/my_focus_news:/src
+            cp /root/my_focus_news/deployment/requirements.txt /root/my_focus_news/deployment/docker/python-env/my_focus_news-requirements.txt
+            cp /root/news_scraper/requirements.txt /root/my_focus_news/deployment/docker/python-env/news_scraper-requirements.txt
 
     3) 考慮把目前所有容器都砍掉:
         docker stop $(docker ps -a -q) ; docker rm $(docker ps -a -q)
+        
+    4) 考慮把前一次 Build 出來的 images 砍掉:
+        docker rmi docker_scraper docker_web
 
-    4) cd 到正確位置
+    5) cd 到正確位置
 
-    5) docker-compose up -d
+    6) docker-compose up -d
 
 
 3. 其他筆記

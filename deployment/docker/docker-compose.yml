@@ -27,7 +27,10 @@ services:
 
   web:
     restart: always
-    build: ./web
+    build:
+      context: ./python-env
+      args:
+        PROJECT_NAME: "my_focus_news"
     container_name: web01
     command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn my_focus_news.wsgi -b 0.0.0.0:8001"
     volumes:
@@ -37,5 +40,20 @@ services:
       - "8001"
     depends_on:
       - db
+    links:
+      - db:db
+
+  scraper:
+    restart: always
+    build:
+      context: ./python-env
+      args:
+        PROJECT_NAME: "news_scraper"
+    container_name: scraper01
+    command: bash -c "python collect_news_to_db.py"
+    volumes:
+      - ../../../news_scraper:/src
+    depends_on:
+      - web
     links:
       - db:db
