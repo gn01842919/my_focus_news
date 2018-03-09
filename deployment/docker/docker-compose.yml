@@ -28,7 +28,7 @@ services:
   web:
     restart: always
     build:
-      context: ./python-env
+      context: ./my-python-env
       args:
         PROJECT_NAME: "my_focus_news"
     container_name: web01
@@ -46,7 +46,7 @@ services:
   scraper:
     restart: always
     build:
-      context: ./python-env
+      context: ./my-python-env
       args:
         PROJECT_NAME: "news_scraper"
     container_name: scraper01
@@ -54,6 +54,7 @@ services:
     volumes:
       - ../../../news_scraper:/src
     depends_on:
+      - db
       - web
     links:
       - db:db
