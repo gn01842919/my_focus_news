@@ -19,14 +19,49 @@
 
 
 ## 簡易使用方式
-1. 安裝 PostgreSQL 並建立資料庫。
-2. pip install -r deployment/requirements.txt
-3. python manage.py migrate
-4. git clone https://github.com/gn01842919/news_scraper.git
-5. pip install news_scraper/requirements.txt
-6. python news_scraper/collect_news_to_db.py
-7. python manage.py runserver
-8. 瀏覽 http://localhost:8000
+1. 安裝 PostgreSQL。
+
+2. `git clone https://github.com/gn01842919/my_focus_news.git`
+
+3. `git clone https://github.com/gn01842919/news_scraper.git`
+
+4. `pip install -r my_focus_news/deployment/requirements.txt`
+
+5. `pip install -r news_scraper/requirements.txt`
+
+6. `python manage.py migrate`
+
+7. `python news_scraper/collect_news_to_db.py`
+
+8. `python manage.py runserver`
+
+9. 瀏覽 http://localhost:8000
+
+
+## 佈署方式
+1. 安裝 Docker 與 Docker Compose
+
+2. `git clone https://github.com/gn01842919/my_focus_news.git`
+
+3. `git clone https://github.com/gn01842919/news_scraper.git`
+
+4. 依環境與需求調整設定黨，包括:
+    1. Django 設定檔 ([my_focus_news/my_focus_news/settings.py](./my_focus_news/settings.py))
+    2. news_scraper 設定檔 ([news_scraper/scraper_config.py](https://github.com/gn01842919/news_scraper/blob/master/scraper_config.py))
+    3. Docker Compose 設定檔 ([my_focus_news/deployment/docker/docker-compose.yml](./deployment/docker/docker-compose.yml))
+    4. [deploy.sh](./deployment/deploy.sh) 中會覆寫上述設定檔的設定(讓開發環境與佈署環境不同)，需要依實際情況調整。目前會/可能被覆寫的設定有:  
+          1. **Django**: DEBUG, ALLOWED_HOSTS, DATABASES["default"]["PASSWORD"]
+          2. **news_scraper**: DB_PASSWORD, ERROR_LOG
+          3. **docker-compose**: POSTGRES_PASSWORD
+        
+5. 執行 `sh my_focus_news/deployment/deploy.sh setup`
+    - 此程式會要求使用者輸入資料庫密碼，以及網站 Hostname (用在 Django 的 ALLOWED_HOSTS 設定)，並覆蓋原先設定。
+    - 資料庫密碼與 Hostname 可接受空白輸入，會自動抓取環境中的 IP，並使用程式碼中寫死的資料庫密碼。
+    - 以下兩項設定無論如何都會被覆寫:
+        1. **Django**: DEBUG ==> False
+        2. **news_scraper**: ERROR_LOG ==> '/src/scraper_error.log'
+        
+6. 測試環境: Ubuntu-16.04
 
 
 ## 其他說明
