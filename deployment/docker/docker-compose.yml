@@ -3,7 +3,7 @@ version: '2'
 services:
   db:
     restart: always
-    image: postgres:10.1-alpine
+    image: postgres:10.3-alpine
     container_name: db01
     environment:
       POSTGRES_USER: dja1
@@ -12,7 +12,7 @@ services:
 
   nginx:
     restart: always
-    image: nginx:1.13.8-alpine
+    image: nginx:1.13-alpine
     container_name: nginx01
     ports:
       - "8080:80"
@@ -50,7 +50,7 @@ services:
       args:
         PROJECT_NAME: "news_scraper"
     container_name: scraper01
-    command: bash -c "python collect_news_to_db.py"
+    command: bash -c "sleep 30 && python schedule.py"
     volumes:
       - ../../../news_scraper:/src
     depends_on:

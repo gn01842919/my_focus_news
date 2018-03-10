@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONF_BACKUP_DIR="/root/.deploy_backup"
+
 BASE_DIR="/root"
 
 # my_focus_news
@@ -13,19 +13,14 @@ SCRAPER_DIR="${BASE_DIR}/news_scraper"
 SCRAPER_CONFIG="${SCRAPER_DIR}/scraper_config.py"
 BACKUP_SCRAPER_CONFIG="scraper_config.py.backup"
 
-# docker
+# backup
+CONF_BACKUP_DIR="${WEB_DIR}/deployment/.deploy_backup"
 
+# docker
 DOCKER_COMPOSE_DIR="${WEB_DIR}/deployment/docker"
 DOCKER_COMPOSE_CONFIG="${DOCKER_COMPOSE_DIR}/docker-compose.yml"
 BACKUP_DOCKER_COMPOSE_CONFIG="docker-compose.yml.backup"
 DOCKERFILE_FOLDER="${DOCKER_COMPOSE_DIR}/my-python-env"
-# BASE_IMG_NAME="my-python-env"
-
-# build_base_image(){
-#     if [ -z "$(docker images -q ${BASE_IMG_NAME}:latest 2> /dev/null)" ]; then
-#         docker build -t "${BASE_IMG_NAME}:001" -t "${BASE_IMG_NAME}:latest" "${DOCKER_COMPOSE_DIR}/${BASE_IMG_NAME}"
-#     fi
-# }
 
 backup_all_configs(){
     [ -d "${CONF_BACKUP_DIR}" ] || mkdir -p "${CONF_BACKUP_DIR}"
@@ -79,11 +74,15 @@ modify_django_config(){
 modify_scraper_config(){
     # $1: password of the database
     if [ -n "$1" ];then
-        local pattern="DB_PASSWORD = .*"
-        local setting="DB_PASSWORD = \"$1\""
-
-        sed -i "s/${pattern}/${setting}/g" ${SCRAPER_CONFIG}
+        local passwd_pattern="DB_PASSWORD = .*"
+        local passwd_setting="DB_PASSWORD = \"$1\""
+        sed -i "s/${passwd_pattern}/${passwd_setting}/g" ${SCRAPER_CONFIG}
     fi
+
+    local log_pattern="ERROR_LOG =.*"
+    local log_setting="ERROR_LOG = \"\/src\/scraper_error.log\""
+
+    sed -i "s/${log_pattern}/${log_setting}/g" ${SCRAPER_CONFIG}
 }
 
 modify_docker_compose_config(){
@@ -120,9 +119,6 @@ cleanup(){
     stop_service
     delete_all_current_containers
     rm -rf ${CONF_BACKUP_DIR}
-    # if [ -n "$(docker images -q ${BASE_IMG_NAME}:latest 2> /dev/null)" ]; then
-    #     docker rmi ${BASE_IMG_NAME}
-    # fi
 }
 
 get_ip(){
@@ -141,7 +137,7 @@ prompt_for_hostname(){
 
 prompt_for_db_password(){
     local password
-    read -p "Please input the password of the database: " password
+    read -p "Please input the password of the database (will use current settings if not provided): " password
     echo $password
 }
 
@@ -151,7 +147,7 @@ case "$1" in
         db_password=`prompt_for_db_password`
 
         if [ "$2" = "clean" ]; then
-        #    restore_all_configs
+            restore_all_configs
             cleanup
         fi
 
@@ -181,7 +177,7 @@ case "$1" in
         cleanup
         ;;
     *)
-        echo "Usage: $0 { setup | setup clean | stop | restore | cleanup }"
+        echo "Usage: $0 { setup | setup clean | start | stop | restore | cleanup }"
         exit 1
 esac
 exit
