@@ -1,6 +1,5 @@
 # my_focus_news
-用來顯示「感興趣的新聞」的網站。需搭配另一專案 [**news_scraper**](https://github.com/gn01842919/news_scraper) 使用。
-
+用來顯示「感興趣的新聞」的網站。需搭配另一專案 [news_scraper](https://github.com/gn01842919/news_scraper) 使用。
 
 
 ## 頁面功能說明
@@ -8,7 +7,7 @@
   - 一旦顯示在此頁面，就會被認定為「已讀」，不需要點擊。
     
 - All News: 顯示所有感興趣的新聞。
-  - 事實上是顯示資料庫中的所有新聞 (只有感興趣的新聞才會被 [**news_scraper**](https://github.com/gn01842919/news_scraper) 寫入資料庫)。
+  - 事實上是顯示資料庫中的所有新聞 (只有感興趣的新聞才會被 [news_scraper](https://github.com/gn01842919/news_scraper) 寫入資料庫)。
     
 - Scraping Rules: 顯示所有用來決定「對哪些新聞感興趣」，以及將新聞分類的規則。
   - 點選其中一個 rule，可看到所有由此 rule 認定為「感興趣」的新聞。
@@ -17,7 +16,6 @@
 - News Categories: 顯示所有新聞分類。
   - 點選其中一個類別，可看到該分類的所有新聞。
   - 一個 Category 可對應到多個 rule，而若某個新聞被顯示在某分類的頁面底下，代表至少有一個該分類對應到的 rule 認定該新聞為「感興趣的」。
-
 
 
 ## 簡易使用方式
@@ -40,7 +38,6 @@
 9. 瀏覽 http://localhost:8000
 
 
-
 ## 佈署方式
 1. 安裝 Docker 與 Docker Compose
 
@@ -48,7 +45,7 @@
 
 3. `git clone https://github.com/gn01842919/news_scraper.git`
 
-4. `cd news_scraper/ ; git clone https://github.com/gn01842919/db_operation_api.git`
+4. `git clone https://github.com/gn01842919/db_operation_api.git news_scraper/`
 
 5. 依環境與需求調整設定黨，包括:
     1. Django 設定檔 ([my_focus_news/my_focus_news/settings.py](./my_focus_news/settings.py))
@@ -72,7 +69,6 @@
     1. 佈署的位置不要寫死 (目前是 /root)，可再任意路徑執行 deploy.sh，然後會自動下載各個所需的專案，並依環境調整設定。
     2. 若要做到前項所述，deploy.sh 應該獨立出來作為一個專案，不該放在 my_focus_news 裡面。
     3. 做到一個指令就完成所有佈署。
-
 
 
 ## 其他說明
