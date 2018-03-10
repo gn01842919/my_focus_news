@@ -107,7 +107,7 @@ delete_all_current_containers(){
 
 start_service(){
     cd ${DOCKER_COMPOSE_DIR}
-    docker-compose up $@
+    docker-compose up -d $@
 }
 
 stop_service(){
