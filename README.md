@@ -2,6 +2,7 @@
 用來顯示「感興趣的新聞」的網站。需搭配另一專案 [**news_scraper**](https://github.com/gn01842919/news_scraper) 使用。
 
 
+
 ## 頁面功能說明
 - Unread News (首頁): 顯示尚未閱讀的感興趣的新聞。
   - 一旦顯示在此頁面，就會被認定為「已讀」，不需要點擊。
@@ -16,6 +17,7 @@
 - News Categories: 顯示所有新聞分類。
   - 點選其中一個類別，可看到該分類的所有新聞。
   - 一個 Category 可對應到多個 rule，而若某個新聞被顯示在某分類的頁面底下，代表至少有一個該分類對應到的 rule 認定該新聞為「感興趣的」。
+
 
 
 ## 簡易使用方式
@@ -38,6 +40,7 @@
 9. 瀏覽 http://localhost:8000
 
 
+
 ## 佈署方式
 1. 安裝 Docker 與 Docker Compose
 
@@ -45,7 +48,9 @@
 
 3. `git clone https://github.com/gn01842919/news_scraper.git`
 
-4. 依環境與需求調整設定黨，包括:
+4. `cd news_scraper/ ; git clone https://github.com/gn01842919/db_operation_api.git`
+
+5. 依環境與需求調整設定黨，包括:
     1. Django 設定檔 ([my_focus_news/my_focus_news/settings.py](./my_focus_news/settings.py))
     2. news_scraper 設定檔 ([news_scraper/scraper_config.py](https://github.com/gn01842919/news_scraper/blob/master/scraper_config.py))
     3. Docker Compose 設定檔 ([my_focus_news/deployment/docker/docker-compose.yml](./deployment/docker/docker-compose.yml))
@@ -53,15 +58,21 @@
           1. **Django**: DEBUG, ALLOWED_HOSTS, DATABASES["default"]["PASSWORD"]
           2. **news_scraper**: DB_PASSWORD, ERROR_LOG
           3. **docker-compose**: POSTGRES_PASSWORD
-        
-5. 執行 `sh my_focus_news/deployment/deploy.sh setup`
+
+6. 執行 `sh my_focus_news/deployment/deploy.sh setup`
     - 此程式會要求使用者輸入資料庫密碼，以及網站 Hostname (用在 Django 的 ALLOWED_HOSTS 設定)，並覆蓋原先設定。
     - 資料庫密碼與 Hostname 可接受空白輸入，會自動抓取環境中的 IP，並使用程式碼中寫死的資料庫密碼。
     - 以下兩項設定無論如何都會被覆寫:
         1. **Django**: DEBUG ==> False
         2. **news_scraper**: ERROR_LOG ==> '/src/scraper_error.log'
-        
-6. 測試環境: Ubuntu-16.04
+
+7. 測試環境: Ubuntu-16.04
+
+8. TO-DO:
+    1. 佈署的位置不要寫死 (目前是 /root)，可再任意路徑執行 deploy.sh，然後會自動下載各個所需的專案，並依環境調整設定。
+    2. 若要做到前項所述，deploy.sh 應該獨立出來作為一個專案，不該放在 my_focus_news 裡面。
+    3. 做到一個指令就完成所有佈署。
+
 
 
 ## 其他說明
