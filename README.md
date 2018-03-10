@@ -1,9 +1,9 @@
 # my_focus_news
-用來「顯示有興趣的新聞」的網站。需搭配另一專案 [**news_scraper**](https://github.com/gn01842919/news_scraper) 使用。
+用來顯示「感興趣的新聞」的網站。需搭配另一專案 [**news_scraper**](https://github.com/gn01842919/news_scraper) 使用。
 
 
 ## 頁面功能說明
-- 首頁 (Unread News): 顯示尚未閱讀的感興趣的新聞。
+- Unread News (首頁): 顯示尚未閱讀的感興趣的新聞。
   - 一旦顯示在此頁面，就會被認定為「已讀」，不需要點擊。
     
 - All News: 顯示所有感興趣的新聞。
