@@ -4,12 +4,19 @@ from shownews.models import NewsData, ScrapingRule, NewsCategory
 from . import common_utils
 
 
-# Create your views here.
 def homepage(request):
+    """Homepage redirects to "Unread News".
+    """
     return redirect('/news/')
 
 
 def unread_news(request):
+    """Display unread News.
+
+    Once displayed on this page, a news is considered "read", and will not be
+    displayed on this page anymore.
+
+    """
 
     unread_news = NewsData.objects.filter(read_time__isnull=True)
 
@@ -31,6 +38,11 @@ def unread_news(request):
 
 
 def all_news(request):
+    """Display all the news in the database.
+
+    Note that only news of interest are stored in the database.
+
+    """
     all_rules = ScrapingRule.objects.all()
     sorted_news_data = common_utils.sort_news_by_scores_of_rules(NewsData.objects.all(), all_rules)
 
@@ -41,10 +53,20 @@ def all_news(request):
 
 
 def rules(request):
+    """Displays all scraping rules, and the number of news it considers of interest.
+
+    Clicking a rule in this page will redirect to the page of ``news_by_rule()``.
+
+    """
     return render(request, 'rules.html', {'all_rules': ScrapingRule.objects.all()})
 
 
 def categories(request):
+    """Displays all news categories (tags), and the number of news having this tag.
+
+    Clicking a category in this page will redirect to the page of ``news_by_category()``.
+
+    """
     return render(
         request, 'categories.html',
         {
@@ -55,7 +77,8 @@ def categories(request):
 
 
 def news_by_category(request, tag_id):
-
+    """Displays the news that falls into this category (in other words, has this tag).
+    """
     tag = NewsCategory.objects.get(id=tag_id)
 
     return render(request, 'news.html', {
@@ -65,7 +88,8 @@ def news_by_category(request, tag_id):
 
 
 def news_by_rule(request, rule_id):
-
+    """Displays the news that are considered of interest by this rule.
+    """
     rule = ScrapingRule.objects.get(id=rule_id)
 
     return render(request, 'news.html', {
