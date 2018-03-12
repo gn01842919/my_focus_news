@@ -6,12 +6,12 @@ BASE_DIR="/root"
 # my_focus_news
 WEB_DIR="${BASE_DIR}/my_focus_news"
 DJANGO_CONFIG="${WEB_DIR}/my_focus_news/settings.py"
-BACKUP_DJANGO_CONFIG="settings.py.backup"
+BACKUP_DJANGO_CONFIG="django-settings.backup"
 
 # news_scraper
 SCRAPER_DIR="${BASE_DIR}/news_scraper"
-SCRAPER_CONFIG="${SCRAPER_DIR}/scraper_config.py"
-BACKUP_SCRAPER_CONFIG="scraper_config.py.backup"
+SCRAPER_CONFIG="${SCRAPER_DIR}/settings.py"
+BACKUP_SCRAPER_CONFIG="scraper-settings.backup"
 
 # backup
 CONF_BACKUP_DIR="${WEB_DIR}/deployment/.deploy_backup"
@@ -74,13 +74,13 @@ modify_django_config(){
 modify_scraper_config(){
     # $1: password of the database
     if [ -n "$1" ];then
-        local passwd_pattern="DB_PASSWORD = .*"
-        local passwd_setting="DB_PASSWORD = \"$1\""
+        local passwd_pattern='"db_password":.*'
+        local passwd_setting="\"db_password\": \"$1\","
         sed -i "s/${passwd_pattern}/${passwd_setting}/g" ${SCRAPER_CONFIG}
     fi
 
-    local log_pattern="ERROR_LOG =.*"
-    local log_setting="ERROR_LOG = \"\/src\/scraper_error.log\""
+    local log_pattern='"error_log":.*'
+    local log_setting="\"error_log\": \"\/src\/scraper_error.log\""
 
     sed -i "s/${log_pattern}/${log_setting}/g" ${SCRAPER_CONFIG}
 }

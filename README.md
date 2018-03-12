@@ -5,10 +5,10 @@
 ## 頁面功能說明
 - Unread News (首頁): 顯示尚未閱讀的感興趣的新聞。
   - 一旦顯示在此頁面，就會被認定為「已讀」，不需要點擊。
-    
+
 - All News: 顯示所有感興趣的新聞。
   - 事實上是顯示資料庫中的所有新聞 (只有感興趣的新聞才會被 [news_scraper](https://github.com/gn01842919/news_scraper) 寫入資料庫)。
-    
+
 - Scraping Rules: 顯示所有用來決定「對哪些新聞感興趣」，以及將新聞分類的規則。
   - 點選其中一個 rule，可看到所有由此 rule 認定為「感興趣」的新聞。
   - 每個 <News, Rule> 組合都會有一個分數，若分數大於零，則該新聞被該 rule 認定為「感興趣」。
@@ -38,7 +38,7 @@
 9. 瀏覽 http://localhost:8000
 
 
-## 佈署方式
+## 正式佈署
 1. 安裝 Docker 與 Docker Compose
 
 2. `git clone https://github.com/gn01842919/my_focus_news.git`
@@ -49,11 +49,11 @@
 
 5. 依環境與需求調整設定黨，包括:
     1. Django 設定檔 ([my_focus_news/my_focus_news/settings.py](./my_focus_news/settings.py))
-    2. news_scraper 設定檔 ([news_scraper/scraper_config.py](https://github.com/gn01842919/news_scraper/blob/master/scraper_config.py))
+    2. news_scraper 設定檔 ([news_scraper/settings.py](https://github.com/gn01842919/news_scraper/blob/master/settings.py))
     3. Docker Compose 設定檔 ([my_focus_news/deployment/docker/docker-compose.yml](./deployment/docker/docker-compose.yml))
-    4. [deploy.sh](./deployment/deploy.sh) 中會覆寫上述設定檔的設定(讓開發環境與佈署環境不同)，需要依實際情況調整。目前會/可能被覆寫的設定有:  
+    4. [deploy.sh](./deployment/deploy.sh) 中會覆寫上述設定檔的設定(讓開發環境與佈署環境不同)，需要依實際情況調整。目前會/可能被覆寫的設定有:
           1. **Django**: DEBUG, ALLOWED_HOSTS, DATABASES["default"]["PASSWORD"]
-          2. **news_scraper**: DB_PASSWORD, ERROR_LOG
+          2. **news_scraper**: DATABASE_CONFIG["db_password"], SCRAPER_CONFIG["error_log"]
           3. **docker-compose**: POSTGRES_PASSWORD
 
 6. 執行 `sh my_focus_news/deployment/deploy.sh setup`
