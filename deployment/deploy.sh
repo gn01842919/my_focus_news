@@ -1,17 +1,28 @@
 #!/bin/bash
 
 
-BASE_DIR="/root"
+BASE_DIR=`pwd`
 
-# my_focus_news
-WEB_DIR="${BASE_DIR}/my_focus_news"
-DJANGO_CONFIG="${WEB_DIR}/my_focus_news/settings.py"
+GIT_PROJECT_BASE='https://github.com/gn01842919'
+
+
+
+
+# my_focus_news (Django)
+WEB_PROJECT="my_focus_news"
+WEB_DIR="${BASE_DIR}/${WEB_PROJECT}"
+DJANGO_CONFIG="${WEB_DIR}/${WEB_PROJECT}/settings.py"
 BACKUP_DJANGO_CONFIG="django-settings.backup"
 
 # news_scraper
-SCRAPER_DIR="${BASE_DIR}/news_scraper"
+SCRAPER_PROJECT="news_scraper"
+SCRAPER_DIR="${BASE_DIR}/${SCRAPER_PROJECT}"
 SCRAPER_CONFIG="${SCRAPER_DIR}/settings.py"
 BACKUP_SCRAPER_CONFIG="scraper-settings.backup"
+
+# db_operation_api
+DB_API_PROJECT="db_operation_api"
+DB_API_DIR="${SCRAPER_DIR}/${DB_API_PROJECT}"
 
 # backup
 CONF_BACKUP_DIR="${WEB_DIR}/deployment/.deploy_backup"
@@ -21,6 +32,28 @@ DOCKER_COMPOSE_DIR="${WEB_DIR}/deployment/docker"
 DOCKER_COMPOSE_CONFIG="${DOCKER_COMPOSE_DIR}/docker-compose.yml"
 BACKUP_DOCKER_COMPOSE_CONFIG="docker-compose.yml.backup"
 DOCKERFILE_FOLDER="${DOCKER_COMPOSE_DIR}/my-python-env"
+
+
+clone_or_update_project_sources(){
+    clone_or_pull_a_project "${WEB_PROJECT}" "${WEB_DIR}"
+    clone_or_pull_a_project "${SCRAPER_PROJECT}" "${SCRAPER_DIR}"
+    clone_or_pull_a_project "${DB_API_PROJECT}" "${DB_API_DIR}"
+}
+
+clone_or_pull_a_project(){
+    # $1: project_name
+    local project_name="$1"
+    local source_dir="$2"
+
+    if [ ! -d ${source_dir} ]; then
+        echo "[+] git clone: ${project_name}.git"
+        git clone "${GIT_PROJECT_BASE}/${project_name}.git" "${source_dir}"
+    else
+        cd ${source_dir}
+        echo "[+] git pull: `pwd`"
+        cd ${BASE_DIR}
+    fi
+}
 
 backup_all_configs(){
     [ -d "${CONF_BACKUP_DIR}" ] || mkdir -p "${CONF_BACKUP_DIR}"
@@ -49,8 +82,8 @@ restore_config(){
 
 copy_pip_requirements_for_building_images(){
     local filename="requirements.txt"
-    cp "${WEB_DIR}/deployment/${filename}" "${DOCKERFILE_FOLDER}/my_focus_news-${filename}"
-    cp "${SCRAPER_DIR}/${filename}" "${DOCKERFILE_FOLDER}/news_scraper-${filename}"
+    cp "${WEB_DIR}/deployment/${filename}" "${DOCKERFILE_FOLDER}/${WEB_PROJECT}-${filename}"
+    cp "${SCRAPER_DIR}/${filename}" "${DOCKERFILE_FOLDER}/${SCRAPER_PROJECT}-${filename}"
 }
 
 modify_django_config(){
@@ -149,6 +182,7 @@ case "$1" in
         if [ "$2" = "clean" ]; then
             restore_all_configs
             cleanup
+            clone_or_update_project_sources
         fi
 
         # build_base_image
