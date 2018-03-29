@@ -49,3 +49,8 @@
 ## 其他說明
 
 - 此網站開發過程使用 TDD，詳細方法參考自[測試驅動開發：使用 Python (Test-Driven Development with Python)](https://www.tenlong.com.tw/products/9789864760244) 一書。
+
+
+# To-Do
+
+- 「Unread News」頁面邏輯不對，現在是一旦在 Unread News 頁面顯示出來過，就設為已讀。但若有不同人使用這個網站，就會造成自己要看的新聞已經被別人讀過了。應該要改用 Session。
