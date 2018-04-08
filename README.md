@@ -2,6 +2,8 @@
 
 用來顯示「感興趣的新聞」的網站。需搭配另一專案 [news_scraper](https://github.com/gn01842919/news_scraper) 使用。
 
+## Demo 網站
+[Demo Site](http://nas17d598.myqnapcloud.com/news/all/)
 
 ## 頁面功能說明
 
